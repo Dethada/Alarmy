@@ -1,1 +1,0 @@
-FROM rpi-base

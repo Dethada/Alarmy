@@ -13,16 +13,17 @@ services:
     build: backend/
     restart: always
     depends_on:
-      - mongodb
+      - postgres
 
-  mongodb:
-    build: mongodb/
+  postgres:
+    build: postgres/
     restart: always
-    ports:
-      - 27017:27017
+    environment:
+      POSTGRES_PASSWORD: verysecurepassword123
     volumes:
-      - v-mongo:/data/db
-      # - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - v-postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
   mqtt:
     build: mqtt/
@@ -30,7 +31,8 @@ services:
 
   agent:
     build: agent/
+    privileged: true
     restart: always
 
 volumes:
-  v-mongo:
+  v-postgres:
