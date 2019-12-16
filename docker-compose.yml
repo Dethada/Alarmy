@@ -1,0 +1,36 @@
+version: '2.4'
+
+services:
+
+  gateway:
+    build: frontend/
+    restart: always
+    ports:
+      - 8080:80
+      - 8443:443
+
+  backend:
+    build: backend/
+    restart: always
+    depends_on:
+      - mongodb
+
+  mongodb:
+    build: mongodb/
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - v-mongo:/data/db
+      # - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  mqtt:
+    build: mqtt/
+    restart: always
+
+  agent:
+    build: agent/
+    restart: always
+
+volumes:
+  v-mongo:
