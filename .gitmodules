@@ -1,0 +1,3 @@
+[submodule "agent/nanpy-firmware"]
+	path = agent/nanpy-firmware
+	url = https://github.com/nanpy/nanpy-firmware.git
