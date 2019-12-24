@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-import os
 from typing import Optional
-from gpiozero import MotionSensor
 import numpy as np
 import cv2
-from dotenv import load_dotenv
-load_dotenv()
 
-MOTION_PIN = os.getenv('MOTION_PIN')
 # initialize the HOG descriptor/person detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -15,7 +10,7 @@ hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 # open webcam video stream
 cap = cv2.VideoCapture(0)
 
-def detect_person_frame(src_frame: np.ndarray) -> Optional[np.ndarray]:
+def detect_person(src_frame: np.ndarray) -> Optional[np.ndarray]:
     """Detect if a person is in a frame.
 
     Args:
@@ -45,19 +40,15 @@ def detect_person_frame(src_frame: np.ndarray) -> Optional[np.ndarray]:
         return frame
     return None
 
-def detect_person():
+print('Started...')
+while True:
+    # Capture frame-by-frame
     _, frame = cap.read()
-    res = detect_person_frame(frame)
+    res = detect_person(frame)
     if res is not None:
-        print('Person detected')
-    else:
-        print('False alarm')
+        print('Person detected!')
+        cv2.imwrite("out.jpg", res)
+        break
 
-def main():
-    pir = MotionSensor(MOTION_PIN, sample_rate=5, queue_len=1)
-    print('Started...')
-
-    pir.when_motion = detect_person
-
-if __name__ == "__main__":
-    main()
+# When everything done, release the capture
+cap.release()

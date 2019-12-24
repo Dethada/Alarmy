@@ -1,1 +1,1 @@
-FROM rpi-base
+FROM rpi-opencv:latest

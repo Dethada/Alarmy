@@ -6,7 +6,6 @@ from gpiozero import MotionSensor
 from gpiozero import MCP3008
 from nanpy import ArduinoApi
 from nanpy import SerialManager
-from picamera import PiCamera
 from rpi_lcd import LCD
 import adafruit_matrixkeypad
 import board
@@ -23,16 +22,6 @@ def nanpy_connect():
     connection = SerialManager(device='/dev/ttyUSB0')
     arduinoObject = ArduinoApi(connection=connection)
     return arduinoObject
-
-def test_picam():
-    print('Testing Pi Camera...')
-    camera = PiCamera()
-    camera.resolution = (1024, 768)
-    camera.start_preview()
-    # Camera warm-up time
-    sleep(2)
-    camera.capture('/tmp/foo.jpg')
-    return True
 
 def test_buzzer():
     print('Testing buzzer...')
@@ -104,14 +93,13 @@ def test_lm35():
     return ans == 'y'
 
 def main():
-    picam_result = test_picam()
     buzzer_result = test_buzzer()
     lcd_result = test_lcd()
     motion_result = test_motionsensor()
     keypad_result = test_keypad()
     mq2_result = test_mq2()
     lm35_result = test_lm35()
-    print('Results:\nPiCam: {}\nBuzzer: {}\nLCD: {}\nMotion Sensor: {}\nKeypad: {}\nMQ2: {}\nLM35: {}'.format(picam_result, buzzer_result, lcd_result, motion_result, keypad_result, mq2_result, lm35_result))
+    print('Results:\nBuzzer: {}\nLCD: {}\nMotion Sensor: {}\nKeypad: {}\nMQ2: {}\nLM35: {}'.format(buzzer_result, lcd_result, motion_result, keypad_result, mq2_result, lm35_result))
 
 if __name__ == '__main__':
     main()

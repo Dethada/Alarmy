@@ -13,7 +13,7 @@ spidev = "*"
 nanpy = "*"
 rpi-lcd = "*"
 adafruit-circuitpython-matrixkeypad = "*"
-picamera = "*"
+opencv-contrib-python = "==4.1.0.25"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
