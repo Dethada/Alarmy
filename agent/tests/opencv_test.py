@@ -10,6 +10,7 @@ hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 # open webcam video stream
 cap = cv2.VideoCapture(0)
 
+
 def detect_person(src_frame: np.ndarray) -> Optional[np.ndarray]:
     """Detect if a person is in a frame.
 
@@ -27,18 +28,19 @@ def detect_person(src_frame: np.ndarray) -> Optional[np.ndarray]:
 
     # detect people in the image
     # returns the bounding boxes for the detected objects
-    boxes, weights = hog.detectMultiScale(frame, winStride=(8,8))
+    boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
 
     boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
-    
+
     if boxes.any():
         for (xA, yA, xB, yB) in boxes:
             # display the detected boxes in the colour picture
             cv2.rectangle(frame, (xA, yA), (xB, yB),
-                            (0, 255, 0), 2)
-        
+                          (0, 255, 0), 2)
+
         return frame
     return None
+
 
 print('Started...')
 while True:

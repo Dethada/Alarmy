@@ -3,7 +3,6 @@ import os
 from time import sleep
 from gpiozero import Buzzer
 from gpiozero import MotionSensor
-from gpiozero import MCP3008
 from nanpy import ArduinoApi
 from nanpy import SerialManager
 from rpi_lcd import LCD
@@ -18,10 +17,12 @@ MQ2_PIN = os.getenv('MQ2_PIN')
 LM35_PIN = os.getenv('LM35_PIN')
 MOTION_PIN = os.getenv('MOTION_PIN')
 
+
 def nanpy_connect():
     connection = SerialManager(device='/dev/ttyUSB0')
     arduinoObject = ArduinoApi(connection=connection)
     return arduinoObject
+
 
 def test_buzzer():
     print('Testing buzzer...')
@@ -32,6 +33,7 @@ def test_buzzer():
     ans = input('Heard a buzz? y/n: ')
     return ans == 'y'
 
+
 def test_lcd():
     print('Testing LCD...')
     lcd = LCD()
@@ -40,17 +42,21 @@ def test_lcd():
     lcd.clear()
     return ans == 'y'
 
+
 def test_motionsensor():
     print('Testing motion sensor...')
-    pir = MotionSensor(MOTION_PIN, sample_rate=5,queue_len=1)
+    pir = MotionSensor(MOTION_PIN, sample_rate=5, queue_len=1)
     print('Activate the motion sensor')
     pir.wait_for_motion()
     return True
 
+
 def test_keypad():
     # 4x4 matrix keypad
-    rows = [DigitalInOut(x) for x in (board.D4, board.D17, board.D27, board.D22)]
-    cols = [DigitalInOut(x) for x in (board.D18, board.D23, board.D24, board.D25)]
+    rows = [DigitalInOut(x)
+            for x in (board.D4, board.D17, board.D27, board.D22)]
+    cols = [DigitalInOut(x)
+            for x in (board.D18, board.D23, board.D24, board.D25)]
     keys = (('1', '2', '3', 'A'),
             ('4', '5', '6', 'B'),
             ('7', '8', '9', 'C'),
@@ -73,6 +79,7 @@ def test_keypad():
             print("Pressed: ", entered_keys)
             sleep(0.2)
 
+
 def test_mq2():
     print('Testing MQ2...')
     arduino = nanpy_connect()
@@ -81,6 +88,7 @@ def test_mq2():
     print('Gas Value: {}'.format(value))
     ans = input('Valid value? y/n: ')
     return ans == 'y'
+
 
 def test_lm35():
     print('Testing LM35...')
@@ -92,6 +100,7 @@ def test_lm35():
     ans = input('Valid value? y/n: ')
     return ans == 'y'
 
+
 def main():
     buzzer_result = test_buzzer()
     lcd_result = test_lcd()
@@ -99,7 +108,9 @@ def main():
     keypad_result = test_keypad()
     mq2_result = test_mq2()
     lm35_result = test_lm35()
-    print('Results:\nBuzzer: {}\nLCD: {}\nMotion Sensor: {}\nKeypad: {}\nMQ2: {}\nLM35: {}'.format(buzzer_result, lcd_result, motion_result, keypad_result, mq2_result, lm35_result))
+    print('Results:\nBuzzer: {}\nLCD: {}\nMotion Sensor: {}\nKeypad: {}\nMQ2: {}\nLM35: {}'.format(
+        buzzer_result, lcd_result, motion_result, keypad_result, mq2_result, lm35_result))
+
 
 if __name__ == '__main__':
     main()

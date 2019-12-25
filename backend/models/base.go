@@ -1,4 +1,4 @@
-package main
+package models
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ type query struct{}
 
 func (_ *query) Hello() string { return "Hello, world!" }
 
-func main() {
+func init() {
 	e := godotenv.Load() //Load .env file
 	if e != nil {
 		fmt.Print(e)
@@ -39,12 +39,11 @@ func main() {
 	}
 	defer db.Close()
 
-	s := `
-               type Query {
-                        hello: String!
-                }
-        `
-	schema := graphql.MustParseSchema(s, &query{})
-	http.Handle("/query", &relay.Handler{Schema: schema})
-	log.Fatal(http.ListenAndServe(":9000", nil))
+	//Printing query
+	db.LogMode(true)
+
+	//Automatically create migration as per model
+	db.Debug().AutoMigrate(
+		&User{},
+	)
 }
