@@ -18,12 +18,12 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['JWT_SECRET_KEY'] = 'super-secret'
     register_extensions(app)
-    # register_routes(app)
     register_blueprints(app)
     return app
 
 
 def register_extensions(app):
+    """Register Flask extensions."""
     db.init_app(app)
     migrate.init_app(app, db)
     jwtmanager.init_app(app)
