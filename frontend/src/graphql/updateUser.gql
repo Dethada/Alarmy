@@ -1,0 +1,7 @@
+mutation {
+  updateUser($name: String, $new_password: String, $old_password: String) {
+    user {
+      name
+    }
+  }
+}
