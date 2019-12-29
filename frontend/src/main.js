@@ -8,6 +8,8 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import { createProvider } from './vue-apollo'
+import Chartkick from 'vue-chartkick'
+import Chart from 'chart.js'
 
 Vue.config.productionTip = false
 
@@ -25,6 +27,7 @@ new Vue({
 //   Vue.axios.defaults.baseURL = baseURL;
 // }
 
+Vue.use(Chartkick.use(Chart))
 Vue.use(VueAxios, axios)
 Vue.axios.defaults.baseURL = 'http://192.168.14.131:5000'
 Vue.axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');

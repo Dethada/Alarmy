@@ -1,7 +1,6 @@
 import graphene
 from graphql import GraphQLError
 from graphene_sqlalchemy import SQLAlchemyObjectType
-# from sqlalchemy_utils.types.choice import Choice
 from flask_jwt_extended import get_jwt_claims, get_jwt_identity, jwt_required
 from argon2 import PasswordHasher
 from backend.models import User

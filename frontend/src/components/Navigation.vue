@@ -7,6 +7,7 @@
         <v-btn text to="/">{{ appTitle }}</v-btn>
       </v-toolbar-title>
       <v-btn text class="hidden-sm-and-down" to="/profile">Profile</v-btn>
+      <v-btn text class="hidden-sm-and-down" to="/alerts">Alerts</v-btn>
       <v-btn v-if="userInfo.role === 'Admin'" text class="hidden-sm-and-down" to="/manage">Manage</v-btn>
       <v-spacer class="hidden-sm-and-down"></v-spacer>
       <v-btn text class="hidden-sm-and-down" @click="logout">Log out</v-btn>

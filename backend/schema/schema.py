@@ -1,6 +1,9 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyConnectionField
 from backend.schema.user import *
+from backend.schema.gas import GasType
+from backend.schema.temp import TempType
+from backend.schema.envalert import EnvAlertType
 
 
 class Query(graphene.ObjectType):
@@ -8,10 +11,18 @@ class Query(graphene.ObjectType):
     all_users = SQLAlchemyConnectionField(UserType)
     # all_users = graphene.List(UserType)
     user_info = graphene.Field(UserType)
+    all_gas = SQLAlchemyConnectionField(GasType)
+    all_temp = SQLAlchemyConnectionField(TempType)
+    all_envalert = SQLAlchemyConnectionField(EnvAlertType)
+    user_test = graphene.Field(UserType, email=graphene.String(required=True))
+
 
     @jwt_required
     def resolve_user_info(self, info):
         return User.query.filter_by(email=get_jwt_identity()).first()
+    
+    def resolve_user_test(self, info, email):
+        return User.query.filter_by(email=email).first()
 
 
 class Mutation(graphene.ObjectType):

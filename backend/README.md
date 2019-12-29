@@ -1,3 +1,8 @@
+## Fix
+```
+sudo apt install -y libpq-dev
+```
+
 ## Initalize Database
 ```
 flask db init    # initalize config

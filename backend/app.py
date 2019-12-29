@@ -12,8 +12,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 def create_app():
     app = Flask(__name__.split('.')[0])
     app.debug = True  # Configs
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
-        os.path.join(basedir, 'data.sqlite')
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://alarmyuser:verysecurepassword123@192.168.1.17/alarmy'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['JWT_SECRET_KEY'] = 'super-secret'

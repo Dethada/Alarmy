@@ -116,7 +116,7 @@ export default {
     roles: ["Admin", "User"],
     selected: [],
     dialog: false,
-    formTitle: "New Item"
+    formTitle: "New User"
   }),
 
   watch: {
@@ -185,6 +185,7 @@ export default {
         .then(data => {
           this.sendSuccess("Updated user");
           this.dialog = false;
+          this.$apollo.queries.allUsers.refetch();
           // Result
           console.log(data);
         })
@@ -213,6 +214,7 @@ export default {
         })
         .then(data => {
           this.sendSuccess("Deleted user");
+          this.$apollo.queries.allUsers.refetch();
           // Result
           console.log(data);
         })
@@ -258,6 +260,7 @@ export default {
         })
         .then(data => {
           this.sendSuccess("Created new user");
+          this.$apollo.queries.allUsers.refetch();
           this.dialog = false;
           // Result
           console.log(data);
