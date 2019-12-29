@@ -16,5 +16,5 @@ try:
         sys.stdout.flush()
         time.sleep(0.1)
 
-except:
+except KeyboardInterrupt:
     print("\nAbort by user")

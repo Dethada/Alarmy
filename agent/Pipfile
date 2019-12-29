@@ -14,6 +14,9 @@ nanpy = "*"
 rpi-lcd = "*"
 adafruit-circuitpython-matrixkeypad = "*"
 opencv-contrib-python = "==4.1.0.25"
+sqlalchemy = "*"
+psycopg2 = "*"
+paho-mqtt = "*"
 
 [requires]
 python_version = "3.7"
