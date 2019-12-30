@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from typing import Optional
+import base64
 import numpy as np
 import cv2
 
@@ -46,6 +47,10 @@ print('Started...')
 while True:
     # Capture frame-by-frame
     _, frame = cap.read()
+    # _, buffer_img = cv2.imencode('.jpg', frame)
+    # data = f'data:image/jpeg;base64,{base64.b64encode(buffer_img).decode()}'
+    # print(data)
+
     res = detect_person(frame)
     if res is not None:
         print('Person detected!')

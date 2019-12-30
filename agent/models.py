@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean
+from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean, Text
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
@@ -16,6 +16,17 @@ class User(Base):
 
     def __repr__(self):
         return '<User %r>' % self.email
+
+
+class PersonAlert(Base):
+    __tablename__ = "person_alert"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    alert_time = Column(DateTime, default=datetime.now, nullable=False)
+    image = Column(Text, nullable=False)
+
+    def __str__(self):
+        return '<Person alert at %r>' % self.alert_time
 
 
 class EnvAlert(Base):
