@@ -1,8 +1,21 @@
-from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String
+from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
 Base = declarative_base()
+
+
+class User(Base):
+    __tablename__ = 'users'
+
+    email = Column(String(320), primary_key=True)
+    name = Column(String(100), nullable=False)
+    role = Column(String(10), default='user', nullable=False)
+    password = Column(String(80), nullable=False)
+    get_alerts = Column(Boolean, nullable=False)
+
+    def __repr__(self):
+        return '<User %r>' % self.email
 
 
 class EnvAlert(Base):
