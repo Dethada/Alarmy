@@ -28,6 +28,8 @@ services:
   mqtt:
     build: mqtt/
     restart: always
+    ports:
+      - 1883:1883
 
   agent:
     build: agent/

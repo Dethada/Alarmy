@@ -2,16 +2,18 @@
 #!/usr/bin/env python3
 
 # adapted from https://github.com/tutRPi/Raspberry-Pi-Gas-Sensor-MQ/blob/master/mq.py
+import os
 import time
 import math
-from nanpy import ArduinoApi
-from nanpy import SerialManager
+from utils import nanpy_connect
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class MQ2():
 
     ######################### Hardware Related Macros #########################
-    MQ_PIN = 0        # define which analog input channel you are going to use
+    MQ_PIN = int(os.getenv('MQ2_PIN')) # define which analog input channel you are going to use
     RL_VALUE = 5        # define the load resistance on the board, in kilo ohms
     # RO_CLEAR_AIR_FACTOR=(Sensor resistance in clean air)/RO,
     RO_CLEAN_AIR_FACTOR = 9.83
@@ -37,8 +39,7 @@ class MQ2():
     def __init__(self, Ro=10, analogPin=0):
         self.Ro = Ro
         self.MQ_PIN = analogPin
-        self.connection = SerialManager(device='/dev/ttyUSB0')
-        self.arduino = ArduinoApi(connection=self.connection)
+        self.arduino = nanpy_connect()
         self.arduino.pinMode(self.MQ_PIN, self.arduino.INPUT)
 
         # two points are taken from the curve.
