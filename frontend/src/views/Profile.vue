@@ -5,7 +5,8 @@
         <form>
           <v-text-field v-model="userInfo.name" :counter="100" label="Name"></v-text-field>
           <v-text-field v-model="userInfo.email" label="Email" readonly></v-text-field>
-          <v-text-field v-model="userInfo.role" label="Role" readonly></v-text-field>
+          <v-select v-model="userInfo.role" :items="['Admin', 'User']" label="Role" readonly></v-select>
+          <v-select v-model="userInfo.getAlerts" :items="[true, false]" label="Notify"></v-select>
           <v-text-field v-model="old_pw" label="Old Password" type="password"></v-text-field>
           <v-text-field v-model="new_pw" label="New Password" type="password"></v-text-field>
 
@@ -29,6 +30,7 @@ export default {
           name
           email
           role
+          getAlerts
         }
       }
     `
@@ -56,11 +58,13 @@ export default {
           mutation: gql`
             mutation(
               $name: String
+              $getAlerts: Boolean
               $new_password: String
               $old_password: String
             ) {
               updateUser(
                 name: $name
+                getAlerts: $getAlerts
                 newPassword: $new_password
                 oldPassword: $old_password
               ) {
@@ -73,6 +77,7 @@ export default {
           // Parameters
           variables: {
             name: this.userInfo.name,
+            getAlerts: this.userInfo.getAlerts,
             old_password: this.old_pw,
             new_password: this.new_pw
           }

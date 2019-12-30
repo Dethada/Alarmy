@@ -33,20 +33,10 @@
                   </v-card-actions>
                 </v-form>
               </v-card-text>
-              <v-btn @click="test" color="primary">Test</v-btn>
             </v-card>
           </v-col>
         </v-row>
       </v-container>
-      <v-snackbar
-        v-model="snackbar"
-        :bottom="snackbar_bottom"
-        :right="snackbar_bottom"
-        :timeout="snackbar_timeout"
-      >
-        {{ snackbar_text }}
-        <v-btn :color="snackbar_color" text @click="snackbar = false">Close</v-btn>
-      </v-snackbar>
     </v-content>
   </v-app>
 </template>
@@ -61,12 +51,6 @@ export default {
     return {
       email: "",
       password: "",
-      snackbar: false,
-      snackbar_color: "pink",
-      snackbar_text: "",
-      snackbar_timeout: 5000,
-      snackbar_right: true,
-      snackbar_bottom: true
     };
   },
   methods: {
@@ -83,17 +67,13 @@ export default {
           axios.defaults.headers.common["Authorization"] =
             "Bearer " + resp.data.access_token;
           this.sendSuccess('Login Success!')
-          this.$emit("loggedin");
+          this.$router.push('/')
+          this.$emit("loggedin")
         })
         .catch(err => {
           this.sendError('Login Failed!')
         });
     },
-    test() {
-      axios.get("/api/example").then(resp => {
-        console.log(resp.data);
-      });
-    }
   }
 };
 </script>
