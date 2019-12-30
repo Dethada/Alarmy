@@ -1,6 +1,5 @@
 from .models import User
-from flask import jsonify, request
-from flask import Blueprint
+from flask import jsonify, request, Response, Blueprint
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -13,8 +12,10 @@ from flask_jwt_extended import (
 from flask_graphql import GraphQLView
 from argon2 import PasswordHasher
 from .schema import schema
-from.extensions import db, jwtmanager
+from .camera import opencv_camera
+from .extensions import db, jwtmanager
 
+Camera = opencv_camera.Camera
 blueprint = Blueprint('general', __name__)
 
 # Create a function that will be called whenever create_access_token
@@ -55,31 +56,6 @@ def login_view():
 
     return jsonify({"msg": "Bad email or password"}), 401
 
-# @blueprint.route('/token/auth', methods=['POST'])
-# def login():
-#     if not request.is_json:
-#         return jsonify({"msg": "Missing JSON in request"}), 400
-
-#     email = request.json.get('email', None)
-#     password = request.json.get('pass', None)
-#     result = User.query.filter_by(email=email).first()
-#     if result:
-#         ph = PasswordHasher()
-#         if ph.verify(result.password, password):
-#             # Create the tokens we will be sending back to the user
-#             access_token = create_access_token(identity=result)
-#             refresh_token = create_refresh_token(identity=result)
-
-#             # Set the JWTs and the CSRF double submit protection cookies
-#             # in this response
-#             resp = jsonify({'login': True})
-#             set_access_cookies(resp, access_token)
-#             set_refresh_cookies(resp, refresh_token)
-#             resp.set_cookie('loggedIn', 'True')
-#             return resp, 200
-
-#     return jsonify({"msg": "Bad email or password"}), 401
-
 
 @blueprint.route('/token/refresh', methods=['POST'])
 @jwt_refresh_token_required
@@ -89,32 +65,22 @@ def refresh():
     result = User.query.filter_by(email=email).first()
     access_token = create_access_token(identity=result)
 
-    # Set the access JWT and CSRF double submit protection cookies
-    # in this response
-    resp = jsonify({'refresh': True})
-    set_access_cookies(resp, access_token)
-    return resp, 200
+    return jsonify(access_token=access_token), 200
+
+def gen(camera):
+    """Video streaming generator function."""
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 
-# Because the JWTs are stored in an httponly cookie now, we cannot
-# log the user out by simply deleting the cookie in the frontend.
-# We need the backend to send us a response to delete the cookies
-# in order to logout. unset_jwt_cookies is a helper function to
-# do just that.
-@blueprint.route('/token/remove', methods=['POST'])
-def logout():
-    resp = jsonify({'logout': True})
-    unset_jwt_cookies(resp)
-    # remove cookie
-    resp.set_cookie('loggedIn', expires=0)
-    return resp, 200
-
-
-@blueprint.route('/api/example', methods=['GET'])
+@blueprint.route('/video_feed')
 @jwt_required
-def protected():
-    email = get_jwt_identity()
-    return jsonify({'hello': 'from {}'.format(email)}), 200
+def video_feed():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(gen(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 graphql_view = blueprint.route('/graphql')(jwt_required(GraphQLView.as_view('graphql', schema=schema.schema, context={'session': db.session},

@@ -2,7 +2,6 @@
   <!-- <v-container md>{{ allEnvalert }}</v-container> -->
   <v-container fluid fill-width>
     <v-data-table
-      v-model="selected"
       :headers="headers"
       :items="envAlertData"
       item-key="email"
@@ -15,8 +14,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <!-- Do not show edit button for current user -->
-        <v-icon small>delete</v-icon>
+        <v-icon small>stop</v-icon>
       </template>
     </v-data-table>
   </v-container>
@@ -76,7 +74,7 @@ export default {
       envAlertData: function() {
           let x = []
           this.allEnvalert.forEach(item => {
-              x.push({
+              x.unshift({
                   time: moment(item.alertTime).format('YYYY-MM-DD hh:mm:ss'),
                   reason: item.reason,
                   temperature: item.temperature.value.toFixed(2),

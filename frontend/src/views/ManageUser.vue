@@ -28,11 +28,31 @@
                     <v-text-field v-model="newUser.name" label="Name" required></v-text-field>
                   </v-row>
                   <v-row>
-                    <v-text-field v-if="formTitle === 'New User'" v-model="newUser.email" label="Email" type="email" required></v-text-field>
-                    <v-text-field v-else v-model="newUser.email" label="Email" type="email" readonly></v-text-field>
+                    <v-text-field
+                      v-if="formTitle === 'New User'"
+                      v-model="newUser.email"
+                      label="Email"
+                      type="email"
+                      required
+                    ></v-text-field>
+                    <v-text-field
+                      v-else
+                      v-model="newUser.email"
+                      label="Email"
+                      type="email"
+                      readonly
+                    ></v-text-field>
                   </v-row>
                   <v-row>
                     <v-select v-model="newUser.role" :items="roles" label="Role" required></v-select>
+                  </v-row>
+                  <v-row>
+                    <v-select
+                      v-model="newUser.getAlerts"
+                      :items="[true, false]"
+                      label="Notify"
+                      required
+                    ></v-select>
                   </v-row>
                   <v-row>
                     <v-text-field
@@ -48,16 +68,29 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="blue darken-1" text @click="close">Close</v-btn>
-                <v-btn v-if="formTitle === 'New User'" color="blue darken-1" text @click="createUser">Create</v-btn>
+                <v-btn
+                  v-if="formTitle === 'New User'"
+                  color="blue darken-1"
+                  text
+                  @click="createUser"
+                >Create</v-btn>
                 <v-btn v-else color="blue darken-1" text @click="editUser">Edit</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
         </v-toolbar>
       </template>
+      <template v-slot:item.notify="{ item }">
+        <v-switch v-model="item.getAlerts" class="ma-2" @click="changeNotify(item)"></v-switch>
+      </template>
       <template v-slot:item.action="{ item }">
         <!-- Do not show edit button for current user -->
-        <v-icon v-if="userInfo.email !== item.email" small class="mr-2" @click="editUserForm(item)">edit</v-icon>
+        <v-icon
+          v-if="userInfo.email !== item.email"
+          small
+          class="mr-2"
+          @click="editUserForm(item)"
+        >edit</v-icon>
         <v-icon small @click="deleteUser(item)">delete</v-icon>
       </template>
     </v-data-table>
@@ -69,7 +102,7 @@ import gql from "graphql-tag";
 import { mapActions } from "vuex";
 
 export default {
-  name: "Manage",
+  name: "ManageUser",
   apollo: {
     allUsers: {
       query: gql`
@@ -80,6 +113,7 @@ export default {
                 name
                 email
                 role
+                getAlerts
               }
             }
           }
@@ -105,12 +139,14 @@ export default {
       { text: "Name", value: "name" },
       { text: "Email", value: "email" },
       { text: "Role", value: "role" },
+      { text: "Notify", value: "notify" },
       { text: "Actions", value: "action", sortable: false }
     ],
     newUser: {
       name: "",
       email: "",
       role: "",
+      getAlerts: "",
       password: ""
     },
     roles: ["Admin", "User"],
@@ -135,8 +171,8 @@ export default {
           email: "",
           role: "",
           password: ""
-        }
-        this.formTitle = "New User"
+        };
+        this.formTitle = "New User";
       }, 300);
     },
     editUserForm(user) {
@@ -144,10 +180,51 @@ export default {
         name: user.name,
         email: user.email,
         role: user.role,
+        getAlerts: user.getAlerts,
         password: ""
-      }
-      this.formTitle = "Edit User"
+      };
+      this.formTitle = "Edit User";
       this.dialog = true;
+    },
+    changeNotify(user) {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: gql`
+            mutation(
+              $email: String
+              $getAlerts: Boolean
+            ) {
+              updateUser(
+                email: $email
+                getAlerts: $getAlerts
+              ) {
+                user {
+                  email
+                  getAlerts
+                }
+              }
+            }
+          `,
+          // Parameters
+          variables: {
+            email: user.email,
+            getAlerts: !user.getAlerts,
+          }
+        })
+        .then(data => {
+          this.sendSuccess("Updated notify for user");
+          this.dialog = false;
+          this.$apollo.queries.allUsers.refetch();
+          // Result
+          console.log(data);
+        })
+        .catch(error => {
+          this.sendError("Failed to update notify for user");
+          this.dialog = false;
+          // Error
+          console.error(error);
+        });
     },
     editUser() {
       this.$apollo
@@ -159,17 +236,20 @@ export default {
               $name: String
               $password: String
               $role: String
+              $getAlerts: Boolean
             ) {
               updateUser(
                 email: $email
                 name: $name
                 newPassword: $password
                 role: $role
+                getAlerts: $getAlerts
               ) {
                 user {
                   name
                   email
                   role
+                  getAlerts
                 }
               }
             }
@@ -178,8 +258,10 @@ export default {
           variables: {
             email: this.newUser.email,
             name: this.newUser.name,
-            password: this.newUser.password === '' ? null : this.newUser.password,
-            role: this.newUser.role
+            password:
+              this.newUser.password === "" ? null : this.newUser.password,
+            role: this.newUser.role,
+            getAlerts: this.newUser.getAlerts
           }
         })
         .then(data => {
