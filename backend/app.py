@@ -3,7 +3,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from argon2 import PasswordHasher
-from .extensions import db, migrate, jwtmanager, cors
+from .extensions import db, migrate, jwtmanager, cors, socketio
 from .views import blueprint
 from .models import User
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -33,6 +33,7 @@ def register_extensions(app):
     migrate.init_app(app, db)
     jwtmanager.init_app(app)
     cors.init_app(app)
+    socketio.init_app(app)
 
 
 def register_blueprints(app):

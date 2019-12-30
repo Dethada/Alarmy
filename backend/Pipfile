@@ -20,6 +20,7 @@ argon2-cffi = "*"
 flask-jwt-extended = "*"
 flask-cors = "*"
 psycopg2 = "*"
+flask-socketio = "*"
 
 [requires]
 python_version = "3.7"

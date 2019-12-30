@@ -1,6 +1,6 @@
 ## Fix
 ```
-sudo apt install -y libpq-dev
+sudo apt install -y libpq-dev libffi-dev
 ```
 
 ## Initalize Database
