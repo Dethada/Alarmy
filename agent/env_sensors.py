@@ -5,8 +5,7 @@ from time import sleep
 from datetime import datetime
 import threading
 from gpiozero import DigitalInputDevice
-import paho.mqtt.publish as publish
-from utils import nanpy_connect, Thread, HWAlert
+from utils import nanpy_connect, Thread, HWAlert, publish_single
 from mq2 import MQ2
 import db
 import models
@@ -14,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+ALARM_DURATION = int(os.getenv('ALARM_DURATION'))
 POLL_INTERVAL = int(os.getenv('POLL_INTERVAL'))
 ALERT_INTERVAL = int(os.getenv('ALERT_INTERVAL'))
 LM35_PIN = os.getenv('LM35_PIN')
@@ -64,31 +64,30 @@ def insert_alert_data(reason):
     return {'time': current_time, 'gas': gas, 'temp': temp}
 
 
-def alert_thread():
+def watch_gas_alerts():
     dpin = DigitalInputDevice(26, pull_up=True)
 
     while True:
-        hwalert.off()
         dpin.wait_for_active()
         print('Alert')
         reason = 'Gases Detected'
         info = insert_alert_data(reason)
         msg = {'subject': 'Gases Detected',
                'content': f'Time: {info["time"]}<br>Temp: {round(info["temp"].value, 2)} LPG: {round(info["gas"].lpg, 5)} CO: {round(info["gas"].co, 5)} Smoke: {round(info["gas"].smoke, 5)}'}
-        publish.single("/alert", json.dumps(msg), hostname="192.168.1.17")
-        hwalert.on(reason)
+        publish_single('/alert', json.dumps(msg))
+        hwalert.run_for(reason, ALARM_DURATION)
         sleep(ALERT_INTERVAL)
 
 
-def poll_thread():
+def poll_env_data():
     while True:
         insert_current_data()
         sleep(POLL_INTERVAL)
 
 
 def main():
-    t1 = Thread(alert_thread)
-    t2 = Thread(poll_thread)
+    gas_alerts_thread = Thread(watch_gas_alerts)
+    poll_env_thread = Thread(poll_env_data)
 
 
 if __name__ == "__main__":

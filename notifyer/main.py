@@ -2,7 +2,9 @@
 import os
 import json
 from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from sendgrid.helpers.mail import (
+    Mail, Attachment, FileContent, FileName,
+    FileType, Disposition, ContentId)
 import paho.mqtt.client as mqtt
 import db
 from models import User
@@ -12,7 +14,7 @@ load_dotenv()
 
 FROM_ADDR = 'alarmy@hiding.icu'
 
-def send_mail(sender, recipient, subject, content):
+def send_mail(sender, recipient, subject, content, image_attachment=None):
     '''
     return true if success, false if failed
     '''
@@ -21,6 +23,14 @@ def send_mail(sender, recipient, subject, content):
         to_emails=recipient,
         subject=subject,
         html_content=content)
+    if image_attachment:
+        attachment = Attachment()
+        attachment.file_content = FileContent(image_attachment)
+        attachment.file_type = FileType('image/jpeg')
+        attachment.file_name = FileName('captured.jpg')
+        attachment.disposition = Disposition('attachment')
+        attachment.content_id = ContentId('defaultcid')
+        message.attachment = attachment
     sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
     response = sg.send(message)
     return response.status_code == 202
@@ -40,9 +50,9 @@ def on_connect(client, userdata, flags, rc):
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, raw_msg):
     msg = json.loads(raw_msg.payload.decode())
-    print(raw_msg.topic, msg)
+    print(raw_msg.topic, msg['subject'], msg['content'])
     for addr in get_emails():
-        if send_mail(FROM_ADDR, addr, msg['subject'], msg['content']):
+        if send_mail(FROM_ADDR, addr, msg['subject'], msg['content'], msg.get('img_attachment')):
             print('Sent mail', msg)
         else:
             print('Failed to send mail')
