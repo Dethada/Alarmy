@@ -3,7 +3,8 @@ from graphene_sqlalchemy import SQLAlchemyConnectionField
 from backend.schema.user import *
 from backend.schema.gas import GasType
 from backend.schema.temp import TempType
-from backend.schema.envalert import EnvAlertType
+from backend.schema.env_alert import EnvAlertType
+from backend.schema.person_alert import PersonAlertType
 
 
 class Query(graphene.ObjectType):
@@ -14,6 +15,7 @@ class Query(graphene.ObjectType):
     all_gas = SQLAlchemyConnectionField(GasType)
     all_temp = SQLAlchemyConnectionField(TempType)
     all_envalert = SQLAlchemyConnectionField(EnvAlertType)
+    all_person_alert = SQLAlchemyConnectionField(PersonAlertType)
     user_test = graphene.Field(UserType, email=graphene.String(required=True))
 
 

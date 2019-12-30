@@ -12,10 +12,8 @@ from flask_jwt_extended import (
 from flask_graphql import GraphQLView
 from argon2 import PasswordHasher
 from .schema import schema
-from .camera import opencv_camera
 from .extensions import db, jwtmanager
 
-Camera = opencv_camera.Camera
 blueprint = Blueprint('general', __name__)
 
 # Create a function that will be called whenever create_access_token
@@ -66,21 +64,6 @@ def refresh():
     access_token = create_access_token(identity=result)
 
     return jsonify(access_token=access_token), 200
-
-def gen(camera):
-    """Video streaming generator function."""
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-
-@blueprint.route('/video_feed')
-@jwt_required
-def video_feed():
-    """Video streaming route. Put this in the src attribute of an img tag."""
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 graphql_view = blueprint.route('/graphql')(jwt_required(GraphQLView.as_view('graphql', schema=schema.schema, context={'session': db.session},

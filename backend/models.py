@@ -13,6 +13,18 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.email
 
+
+class PersonAlert(db.Model):
+    __tablename__ = "person_alert"
+
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    alert_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    image = db.Column(db.Text, nullable=False)
+
+    def __str__(self):
+        return '<Person alert at %r>' % self.alert_time
+
+
 class EnvAlert(db.Model):
     __tablename__ = "env_alert"
 
