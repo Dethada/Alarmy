@@ -4,15 +4,17 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from argon2 import PasswordHasher
 from .extensions import db, migrate, jwtmanager, cors, socketio
+from flask_jwt_extended import jwt_required
 from .views import blueprint
 from .models import User
+from . import events # required to load the websocket events
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 def create_app():
     app = Flask(__name__.split('.')[0])
     app.debug = True  # Configs
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://alarmyuser:verysecurepassword123@192.168.1.17/alarmy'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://alarmyuser:verysecurepassword123@192.168.1.103/alarmy'
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['JWT_SECRET_KEY'] = 'super-secret'
@@ -23,7 +25,6 @@ def create_app():
     # app.config['JWT_COOKIE_SECURE'] = False # False to allow JWT cookies to be sent over http.
     register_extensions(app)
     register_blueprints(app)
-    # create_initial_admin()
     return app
 
 
@@ -32,11 +33,10 @@ def register_extensions(app):
     db.init_app(app)
     migrate.init_app(app, db)
     jwtmanager.init_app(app)
-    cors.init_app(app)
     socketio.init_app(app)
+    cors.init_app(app)
 
 
 def register_blueprints(app):
     """Register Flask blueprints."""
     app.register_blueprint(blueprint)
-    return None

@@ -1,6 +1,6 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from backend.models import PersonAlert
+from src.models import PersonAlert
 
 
 class PersonAlertType(SQLAlchemyObjectType):

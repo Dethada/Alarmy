@@ -3,8 +3,8 @@ from graphql import GraphQLError
 from graphene_sqlalchemy import SQLAlchemyObjectType
 from flask_jwt_extended import get_jwt_claims, get_jwt_identity, jwt_required
 from argon2 import PasswordHasher
-from backend.models import User
-from backend.extensions import db
+from src.models import User
+from src.extensions import db
 
 
 class UserType(SQLAlchemyObjectType):

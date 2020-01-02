@@ -12,7 +12,7 @@ flask db upgrade # apply migration
 
 ## Running
 ```
-flask run
+pipenv run ./run.py
 ```
 
 ### Commands

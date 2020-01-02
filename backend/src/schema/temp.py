@@ -1,9 +1,9 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from backend.models import EnvAlert
+from src.models import Temperature
 
 
-class EnvAlertType(SQLAlchemyObjectType):
+class TempType(SQLAlchemyObjectType):
     class Meta:
-        model = EnvAlert
+        model = Temperature
         interfaces = (graphene.relay.Node, )

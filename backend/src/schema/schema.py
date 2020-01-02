@@ -1,10 +1,10 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyConnectionField
-from backend.schema.user import *
-from backend.schema.gas import GasType
-from backend.schema.temp import TempType
-from backend.schema.env_alert import EnvAlertType
-from backend.schema.person_alert import PersonAlertType
+from src.schema.user import *
+from src.schema.gas import GasType
+from src.schema.temp import TempType
+from src.schema.env_alert import EnvAlertType
+from src.schema.person_alert import PersonAlertType
 
 
 class Query(graphene.ObjectType):

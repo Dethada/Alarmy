@@ -1,4 +1,3 @@
-from .models import User
 from flask import jsonify, request, Response, Blueprint
 from flask_jwt_extended import (
     create_access_token,
@@ -11,6 +10,7 @@ from flask_jwt_extended import (
     jwt_refresh_token_required)
 from flask_graphql import GraphQLView
 from argon2 import PasswordHasher
+from .models import User
 from .schema import schema
 from .extensions import db, jwtmanager
 

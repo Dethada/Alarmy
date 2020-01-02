@@ -1,9 +1,9 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from backend.models import Gas
+from src.models import EnvAlert
 
 
-class GasType(SQLAlchemyObjectType):
+class EnvAlertType(SQLAlchemyObjectType):
     class Meta:
-        model = Gas
+        model = EnvAlert
         interfaces = (graphene.relay.Node, )
