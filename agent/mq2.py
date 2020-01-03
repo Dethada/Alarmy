@@ -6,14 +6,13 @@ import os
 import time
 import math
 from utils import nanpy_connect
-from dotenv import load_dotenv
-load_dotenv()
+from config import config
 
 
 class MQ2():
 
     ######################### Hardware Related Macros #########################
-    MQ_PIN = int(os.getenv('MQ2_PIN')) # define which analog input channel you are going to use
+    MQ_PIN = config.MQ2_PIN # define which analog input channel you are going to use
     RL_VALUE = 5        # define the load resistance on the board, in kilo ohms
     # RO_CLEAR_AIR_FACTOR=(Sensor resistance in clean air)/RO,
     RO_CLEAN_AIR_FACTOR = 9.83
@@ -36,9 +35,8 @@ class MQ2():
     GAS_CO = 1
     GAS_SMOKE = 2
 
-    def __init__(self, Ro=10, analogPin=0):
+    def __init__(self, Ro=10):
         self.Ro = Ro
-        self.MQ_PIN = analogPin
         self.arduino = nanpy_connect()
         self.arduino.pinMode(self.MQ_PIN, self.arduino.INPUT)
 
@@ -155,3 +153,5 @@ class MQ2():
     ############################################################################
     def MQGetPercentage(self, rs_ro_ratio, pcurve):
         return (math.pow(10, (((math.log(rs_ro_ratio)-pcurve[1]) / pcurve[2]) + pcurve[0])))
+
+mq = MQ2()

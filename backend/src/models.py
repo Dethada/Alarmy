@@ -4,6 +4,7 @@ from .extensions import db
 
 class User(db.Model):
     __tablename__ = 'users'
+
     email = db.Column(db.String(320), primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     role = db.Column(db.String(10), default='user', nullable=False)
@@ -12,6 +13,18 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % self.email
+
+
+class Device(db.Model):
+    __tablename__ = 'device'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    alarm = db.Column(db.Boolean, default=False, nullable=False)
+    poll_interval = db.Column(db.Integer, nullable=False)
+    alert_interval = db.Column(db.Integer, nullable=False)
+    alarm_duration = db.Column(db.Integer, nullable=False)
+    email = db.Column(db.String(320), nullable=False)
+    vflip = db.Column(db.Boolean, default=False, nullable=False)
 
 
 class PersonAlert(db.Model):

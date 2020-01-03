@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import os
-import json
 from time import sleep
 from datetime import datetime
 from base64 import b64encode
@@ -10,33 +8,24 @@ from gpiozero import MotionSensor
 import numpy as np
 import cv2
 from gpiozero import DigitalInputDevice
-from utils import nanpy_connect, Thread, HWAlert, publish_single
-from mq2 import MQ2
+from utils import nanpy_connect, Thread
+from hwalert import hwalert
+from notifyer import broadcast_mail
+from mq2 import mq
+from events import sio, ws_notify_users, new_values
 import db
 import models
-from dotenv import load_dotenv
-load_dotenv()
+from config import config
 
-
-ALARM_DURATION = int(os.getenv('ALARM_DURATION'))
-POLL_INTERVAL = int(os.getenv('POLL_INTERVAL'))
-ALERT_INTERVAL = int(os.getenv('ALERT_INTERVAL'))
-LM35_PIN = os.getenv('LM35_PIN')
-BUZZER_PIN = os.getenv('BUZZER_PIN')
-MOTION_PIN = os.getenv('MOTION_PIN')
-VFLIP = True
-
-mq = MQ2()
 arduino = nanpy_connect()
-arduino.pinMode(LM35_PIN, arduino.INPUT)
+arduino.pinMode(config.LM35_PIN, arduino.INPUT)
 lock = threading.Lock()
-hwalert = HWAlert(BUZZER_PIN)
 
 
 def insert_current_data():
     perc = mq.MQPercentage()
     gas = models.Gas(lpg=perc['GAS_LPG'], co=perc['CO'], smoke=perc['SMOKE'])
-    temp_c = (arduino.analogRead(LM35_PIN) * 500) / 1024
+    temp_c = (arduino.analogRead(config.LM35_PIN) * 500) / 1024
     print('Temp: {0:.2f} C'.format(temp_c))
     temp = models.Temperature(value=temp_c)
     print(gas)
@@ -51,7 +40,7 @@ def insert_alert_data(reason):
     current_time = datetime.now()
     gas = models.Gas(lpg=perc['GAS_LPG'], co=perc['CO'],
                      smoke=perc['SMOKE'], capture_time=current_time)
-    temp_c = (arduino.analogRead(LM35_PIN) * 500) / 1024
+    temp_c = (arduino.analogRead(config.LM35_PIN) * 500) / 1024
     print('Temp: {0:.2f} C'.format(temp_c))
     temp = models.Temperature(value=temp_c, capture_time=current_time)
     print(gas)
@@ -81,15 +70,17 @@ def watch_gas_alerts():
         info = insert_alert_data(reason)
         msg = {'subject': 'Gases Detected',
                'content': f'Time: {info["time"]}<br>Temp: {round(info["temp"].value, 2)} LPG: {round(info["gas"].lpg, 5)} CO: {round(info["gas"].co, 5)} Smoke: {round(info["gas"].smoke, 5)}'}
-        publish_single('/alert', json.dumps(msg))
-        hwalert.run_for(reason, ALARM_DURATION)
-        sleep(ALERT_INTERVAL)
+        ws_notify_users('Gases Detected')
+        broadcast_mail(msg)
+        hwalert.run_for(reason, config.ALARM_DURATION)
+        sleep(config.ALERT_INTERVAL)
 
 
 def poll_env_data():
     while True:
         insert_current_data()
-        sleep(POLL_INTERVAL)
+        new_values()
+        sleep(config.POLL_INTERVAL)
 
 
 # hwalert = HWAlert(BUZZER_PIN)
@@ -143,7 +134,7 @@ def insert_data(img_data):
 
 def detect_person():
     _, frame = cap.read()
-    if VFLIP:
+    if config.VFLIP:
         frame = cv2.flip(frame, 0)
     res = detect_person_frame(frame)
     if res is not None:
@@ -153,28 +144,39 @@ def detect_person():
         img_data = f'{b64encode(buffer_img).decode()}'
         alert_time = insert_data(img_data)
         print('Person detected')
-        publish_single('/alert', json.dumps(
-            {'subject': 'Person detected', 'content': f'Person detected at {alert_time}<br><img src="cid:defaultcid"/>', 'img_attachment': img_data}))
-        hwalert.run_for('Person Detected', ALARM_DURATION)
-        sleep(ALERT_INTERVAL)
+        msg = {'subject': 'Person detected', 'content': f'Person detected at {alert_time}<br><img src="cid:defaultcid"/>', 'img_attachment': img_data}
+        ws_notify_users('Person detected!')
+        hwalert.run_for('Person Detected', config.ALARM_DURATION)
+        broadcast_mail(msg)
+        sleep(config.ALERT_INTERVAL)
     else:
         cv2.imwrite("dumps/nope.jpg", frame)
         print('False alarm')
 
 
 def detect_humans():
-    pir = MotionSensor(MOTION_PIN, sample_rate=5, queue_len=1)
+    pir=MotionSensor(config.MOTION_PIN, sample_rate = 5, queue_len = 1)
     print('Started...')
 
-    pir.when_motion = detect_person
+    pir.when_motion=detect_person
 
     while True:
         pass
 
 def main():
-    gas_alerts_thread = Thread(watch_gas_alerts)
-    poll_env_thread = Thread(poll_env_data)
-    human_thread = Thread(detect_humans)
+    device = db.session.query(models.Device).first()
+    config.POLL_INTERVAL = device.poll_interval
+    config.ALARM_DURATION = device.alarm_duration
+    config.ALERT_INTERVAL = device.alert_interval
+    config.FROM_ADDR = device.email
+    config.VFLIP = device.vflip
+    if device.alarm:
+        hwalert.on('')
+    else:
+        hwalert.stop_alert()
+    gas_alerts_thread=Thread(watch_gas_alerts)
+    poll_env_thread=Thread(poll_env_data)
+    human_thread=Thread(detect_humans)
 
 
 if __name__ == "__main__":

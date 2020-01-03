@@ -25,12 +25,6 @@ services:
     ports:
       - 5432:5432
 
-  mqtt:
-    build: mqtt/
-    restart: always
-    ports:
-      - 1883:1883
-
   agent:
     build: agent/
     privileged: true

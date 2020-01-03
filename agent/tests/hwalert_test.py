@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
-from utils import HWAlert
+from hwalert import hwalert
 from time import sleep
 
-hwalert = HWAlert(21)
-# hwalert.on()
+# hwalert.on('ABC')
 # input('Waiting: ')
 # hwalert.off()
 hwalert.run_for('ABC', 10)
-sleep(2)
+sleep(5)
 for i in range(5):
     print(i)
-hwalert.kill()
-# hwalert.thread.join()
+hwalert.stop_alert()

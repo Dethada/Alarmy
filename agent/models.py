@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean, Text
+from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean, Text, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
@@ -16,6 +16,18 @@ class User(Base):
 
     def __repr__(self):
         return '<User %r>' % self.email
+
+
+class Device(Base):
+    __tablename__ = 'device'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    alarm = Column(Boolean, default=False, nullable=False)
+    poll_interval = Column(Integer, nullable=False)
+    alert_interval = Column(Integer, nullable=False)
+    alarm_duration = Column(Integer, nullable=False)
+    email = Column(String(320), nullable=False)
+    vflip = Column(Boolean, default=False, nullable=False)
 
 
 class PersonAlert(Base):

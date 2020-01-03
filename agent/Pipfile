@@ -19,6 +19,7 @@ psycopg2 = "*"
 paho-mqtt = "*"
 websocket-client = "*"
 python-socketio = {extras = ["client"],version = "*"}
+sendgrid = "*"
 
 [requires]
 python_version = "3.7"

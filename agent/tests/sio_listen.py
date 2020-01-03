@@ -5,7 +5,7 @@ sio = socketio.Client()
 
 sio.connect('http://localhost:5000', namespaces=['/alert'])
 
-@sio.on('my_response', namespace='/alert')
+@sio.on('update_device', namespace='/alert')
 def on_message(data):
     print('I received a message!', data)
 
