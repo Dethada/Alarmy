@@ -9,6 +9,7 @@
         <login @loggedin="loggedIn = true" ></login>
       </div>
       <Snackbar></Snackbar>
+      <Alert></Alert>
     </v-content>
   </v-app>
 </template>
@@ -16,6 +17,7 @@
 <script>
 import Navigation from '@/components/Navigation'
 import Snackbar from '@/components/Snackbar'
+import Alert from '@/components/Alert'
 import Login from '@/views/Login'
 
 export default {
@@ -24,7 +26,8 @@ export default {
   components: {
     Login,
     Navigation,
-    Snackbar
+    Snackbar,
+    Alert,
   },
 
   data: () => ({

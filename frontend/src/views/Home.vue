@@ -12,6 +12,12 @@ import gql from "graphql-tag";
 
 export default {
   name: "Home",
+  sockets: {
+    newValues(data) {
+      this.$apollo.queries.allTemp.refetch();
+      this.$apollo.queries.allGas.refetch();
+    }
+  },
   apollo: {
     allGas: {
       query: gql`
@@ -31,7 +37,7 @@ export default {
       variables: {
         last: 10,
       },
-      pollInterval: 60000, // poll every 60 seconds
+      // pollInterval: 60000, // poll every 60 seconds
       update: data => {
         return data.allGas.edges.map(function(edge) {
           return edge.node;
@@ -54,7 +60,7 @@ export default {
       variables: {
         last: 10,
       },
-      pollInterval: 60000, // poll every 60 seconds
+      // pollInterval: 60000, // poll every 60 seconds
       update: data => {
         return data.allTemp.edges.map(function(edge) {
           return [edge.node.captureTime + '+08:00', edge.node.value];

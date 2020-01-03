@@ -28,6 +28,13 @@ const actions = {
     snackbar.color = "green"
     commit('setSnack', snackbar)
   },
+  sendAlert({ commit, state }, text) {
+    let snackbar = state.snackbar
+    snackbar.show = true
+    snackbar.text = text
+    snackbar.color = "orange"
+    commit('setSnack', snackbar)
+  },
   closeSnackbar({ commit, state }) {
     let snackbar = state.snackbar
     snackbar.show = false

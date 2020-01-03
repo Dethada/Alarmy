@@ -91,6 +91,12 @@
           class="mr-2"
           @click="editUserForm(item)"
         >edit</v-icon>
+        <v-icon
+          v-else
+          small
+          class="mr-2"
+          @click="$router.push('/Profile') "
+        >edit</v-icon>
         <v-icon small @click="deleteUser(item)">delete</v-icon>
       </template>
     </v-data-table>
