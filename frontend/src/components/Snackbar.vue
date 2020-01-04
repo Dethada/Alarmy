@@ -11,13 +11,13 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: "Snackbar",
-  computed: mapGetters(['getSnackbar']),
+  computed: mapGetters(["getSnackbar"]),
   methods: {
-    ...mapActions(['closeSnackbar'])
+    ...mapActions(["closeSnackbar"])
   }
 };
 </script>

@@ -83,7 +83,6 @@ export default {
           duration: this.gasDuration
         };
       },
-      // pollInterval: 60000, // poll every 60 seconds
       update: data => {
         return data.allGas.map(function(edge) {
           return edge;
@@ -104,7 +103,6 @@ export default {
           duration: this.tempDuration
         };
       },
-      // pollInterval: 60000, // poll every 60 seconds
       update: data => {
         return data.allTemp.map(function(edge) {
           return [edge.captureTime + "+08:00", edge.value];

@@ -16,9 +16,7 @@
           >
             <template v-slot:item.alertTime="{ item }">{{ formatTime(item.alertTime) }}</template>
             <template v-slot:item.image="{ item }">
-              <!-- <v-btn text @click="$router.push('/alerts/image')">View</v-btn> -->
               <v-icon @click="$router.push('/alerts/detail?cid=' + item.cid)">photo</v-icon>
-              <!-- <a v-bind:href="'data:image/jpeg;base64,'+item.image" target="_blank">View Image</a> -->
             </template>
             <template v-slot:item.action="{ item }">
               <v-icon small @click="deletePersonAlert(item)">delete</v-icon>

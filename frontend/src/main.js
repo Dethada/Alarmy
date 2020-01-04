@@ -18,33 +18,17 @@ Vue.config.productionTip = false
 
 Vue.use(Chartkick.use(Chart))
 
-// const baseURL = 'http://192.168.14.131:5000';
-// axios.defaults.baseURL = baseURL;
-// if (typeof baseURL !== 'undefined') {
-//   Vue.axios.defaults.baseURL = baseURL;
-// }
+const baseURL = process.env.BASE_URL || 'http://192.168.1.103:5000';
+
 const token = localStorage.getItem('token')
-const socket = io('http://192.168.1.103:5000/alert', {
+const socket = io(baseURL + '/alert', {
   query: {token: token}
 });
 
 Vue.use(VueSocketIOExt, socket);
 
-// Vue.use(new VueSocketIO({
-//   debug: true,
-//   connection: 'http://192.168.1.103:5000/alert',
-//   // vuex: {
-//   //     store,
-//   //     actionPrefix: 'SOCKET_',
-//   //     mutationPrefix: 'SOCKET_',
-//   //     options: {
-//   //       useConnectionNamespace: true,
-//   //       namespaceName : 'alert',
-//   //     }
-//   // },
-// }))
 Vue.use(VueAxios, axios)
-Vue.axios.defaults.baseURL = 'http://192.168.1.103:5000'
+Vue.axios.defaults.baseURL = baseURL
 Vue.axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
 
 new Vue({
@@ -54,9 +38,3 @@ new Vue({
   apolloProvider: createProvider(),
   render: h => h(App)
 }).$mount('#app')
-
-// Vue.use(require('@websanova/vue-auth'), {
-//   auth: require('@websanova/vue-auth/drivers/auth/bearer.js'),
-//   http: require('@websanova/vue-auth/drivers/http/axios.1.x.js'),
-//   router: require('@websanova/vue-auth/drivers/router/vue-router.2.x.js')
-// })

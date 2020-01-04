@@ -1,11 +1,12 @@
 <template>
   <v-container fluid fill-width>
     <v-card>
-      <v-container>
+      <v-container v-if="deviceInfo">
         <v-form action="#" @submit.prevent="updateDeviceSettings">
           <v-text-field v-model="deviceInfo.pollInterval" label="Poll Interval"></v-text-field>
           <v-text-field v-model="deviceInfo.alertInterval" label="Alert Interval"></v-text-field>
           <v-text-field v-model="deviceInfo.alarmDuration" label="Alarm Duration"></v-text-field>
+          <v-text-field v-model="deviceInfo.tempThreshold" label="Temperature Threshold"></v-text-field>
           <v-text-field v-model="deviceInfo.email" label="From Email"></v-text-field>
           <v-text-field v-model="deviceInfo.motd" counter=32 label="Message of the Day"></v-text-field>
           <v-text-field
@@ -18,6 +19,7 @@
           ></v-text-field>
           <v-switch v-model="deviceInfo.alarm" class="ma-2" label="Toggle Alarm"></v-switch>
           <v-switch v-model="deviceInfo.vflip" class="ma-2" label="Vertically flip camera"></v-switch>
+          <v-switch v-model="deviceInfo.detectHumans" class="ma-2" label="Detect Humans"></v-switch>
           <v-btn class="mr-4" type="submit">submit</v-btn>
         </v-form>
       </v-container>
@@ -43,6 +45,8 @@ export default {
           vflip
           motd
           alarmCode
+          detectHumans
+          tempThreshold
         }
       }
     `
@@ -50,7 +54,8 @@ export default {
 
   data() {
     return {
-      visibleCode: false
+      visibleCode: false,
+      deviceInfo: null,
     };
   },
 
@@ -70,6 +75,8 @@ export default {
               $vflip: Boolean
               $motd: String
               $alarmCode: String
+              $detectHumans: Boolean
+              $tempThreshold: Int
             ) {
               updateDevice(
                 pollInterval: $pollInterval
@@ -80,6 +87,8 @@ export default {
                 vflip: $vflip
                 motd: $motd
                 alarmCode: $alarmCode
+                detectHumans: $detectHumans
+                tempThreshold: $tempThreshold
               ) {
                 device {
                   alarm
@@ -95,7 +104,9 @@ export default {
             email: this.deviceInfo.email,
             vflip: this.deviceInfo.vflip,
             motd: this.deviceInfo.motd,
-            alarmCode: this.deviceInfo.alarmCode
+            alarmCode: this.deviceInfo.alarmCode,
+            detectHumans: this.deviceInfo.detectHumans,
+            tempThreshold: this.deviceInfo.tempThreshold,
           }
         })
         .then(data => {

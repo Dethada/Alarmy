@@ -1,5 +1,4 @@
 <template>
-  <!-- <v-container md>{{ allUsers }}</v-container> -->
   <v-container fluid fill-width>
     <v-data-table
       v-model="selected"
@@ -84,7 +83,6 @@
         <v-switch v-model="item.getAlerts" class="ma-2" @click="changeNotify(item)"></v-switch>
       </template>
       <template v-slot:item.action="{ item }">
-        <!-- Do not show edit button for current user -->
         <v-icon
           v-if="userInfo.email !== item.email"
           small
