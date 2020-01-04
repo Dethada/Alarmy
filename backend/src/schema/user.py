@@ -16,13 +16,11 @@ class UserType(SQLAlchemyObjectType):
 
 class CreateUserMutation(graphene.Mutation):
     class Arguments:
-        # The input arguments for this mutation
         email = graphene.String(required=True)
         name = graphene.String(required=True)
         role = graphene.String(required=True)
         password = graphene.String(required=True)
 
-    # The class attributes define the response of the mutation
     user = graphene.Field(UserType)
 
     @jwt_required
@@ -38,13 +36,11 @@ class CreateUserMutation(graphene.Mutation):
                     password=ph.hash(password))
         db.session.add(user)
         db.session.commit()
-        # Notice we return an instance of this mutation
         return CreateUserMutation(user=user)
 
 
 class UpdateUserMutation(graphene.Mutation):
     class Arguments:
-        # The input arguments for this mutation
         email = graphene.String()
         name = graphene.String()
         role = graphene.String()
@@ -52,7 +48,6 @@ class UpdateUserMutation(graphene.Mutation):
         old_password = graphene.String()
         new_password = graphene.String()
 
-    # The class attributes define the response of the mutation
     user = graphene.Field(UserType)
 
     @jwt_required
@@ -70,8 +65,6 @@ class UpdateUserMutation(graphene.Mutation):
                 user.password = ph.hash(new_password)
 
             db.session.commit()
-            # Notice we return an instance of this mutation
-            # return UpdateUserMutation(user=user)
         else:
             user = User.query.filter_by(email=get_jwt_identity()).first()
             ph = PasswordHasher()
@@ -83,16 +76,13 @@ class UpdateUserMutation(graphene.Mutation):
                 user.password = ph.hash(new_password)
 
             db.session.commit()
-            # Notice we return an instance of this mutation
         return UpdateUserMutation(user=user)
 
 
 class DeleteUserMutation(graphene.Mutation):
     class Arguments:
-        # The input arguments for this mutation
         email = graphene.String()
 
-    # The class attributes define the response of the mutation
     result = graphene.Field(graphene.String)
 
     @jwt_required

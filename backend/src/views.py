@@ -1,13 +1,5 @@
-from flask import jsonify, request, Response, Blueprint
-from flask_jwt_extended import (
-    create_access_token,
-    jwt_required,
-    set_access_cookies,
-    set_refresh_cookies,
-    create_refresh_token,
-    get_jwt_identity,
-    unset_jwt_cookies,
-    jwt_refresh_token_required)
+from flask import jsonify, request, Blueprint
+from flask_jwt_extended import create_access_token, jwt_required
 from flask_graphql import GraphQLView
 from argon2 import PasswordHasher
 from .models import User
@@ -53,17 +45,6 @@ def login_view():
             return jsonify(access_token=access_token), 200
 
     return jsonify({"msg": "Bad email or password"}), 401
-
-
-@blueprint.route('/token/refresh', methods=['POST'])
-@jwt_refresh_token_required
-def refresh():
-    # Create the new access token
-    email = get_jwt_identity()
-    result = User.query.filter_by(email=email).first()
-    access_token = create_access_token(identity=result)
-
-    return jsonify(access_token=access_token), 200
 
 
 graphql_view = blueprint.route('/graphql')(jwt_required(GraphQLView.as_view('graphql', schema=schema.schema, context={'session': db.session},

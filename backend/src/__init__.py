@@ -7,22 +7,26 @@ from .extensions import db, migrate, jwtmanager, cors, socketio
 from flask_jwt_extended import jwt_required
 from .views import blueprint
 from .models import User
-from . import events # required to load the websocket events
+from . import events  # required to load the websocket events
+from dotenv import load_dotenv
+load_dotenv()
+
+DB_HOST = os.getenv('DB_HOST')
+DB_USER = os.getenv('DB_USER')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 def create_app():
     app = Flask(__name__.split('.')[0])
     app.debug = True  # Configs
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://alarmyuser:verysecurepassword123@192.168.1.103/alarmy'
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['JWT_SECRET_KEY'] = 'super-secret'
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
-    # app.config['JWT_REFRESH_COOKIE_PATH'] = '/token/refresh'
-    # app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-    # app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-    # app.config['JWT_COOKIE_SECURE'] = False # False to allow JWT cookies to be sent over http.
     register_extensions(app)
     register_blueprints(app)
     return app

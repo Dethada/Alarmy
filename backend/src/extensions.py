@@ -6,6 +6,6 @@ from flask_socketio import SocketIO
 
 db = SQLAlchemy()
 migrate = Migrate()
-jwtmanager= JWTManager()
+jwtmanager = JWTManager()
 cors = CORS()
 socketio = SocketIO(cors_allowed_origins='*')

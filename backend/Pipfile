@@ -25,6 +25,7 @@ gunicorn = "*"
 eventlet = "*"
 flask-socketio = "*"
 pandas = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.7"

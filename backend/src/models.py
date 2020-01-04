@@ -48,23 +48,30 @@ class EnvAlert(db.Model):
     cid = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     alert_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
     reason = db.Column(db.String(100), nullable=False)
-    gas_ticker = db.Column(db.BigInteger, db.ForeignKey('gas.ticker'), nullable=False)
-    temp_ticker = db.Column(db.BigInteger, db.ForeignKey('temperature.ticker'), nullable=False)
-    gas = db.relationship("Gas", backref=db.backref("env_alert", uselist=False), lazy=True)
-    temperature = db.relationship("Temperature", backref=db.backref("env_alert", uselist=False), lazy=True)
+    gas_ticker = db.Column(db.BigInteger, db.ForeignKey(
+        'gas.ticker'), nullable=False)
+    temp_ticker = db.Column(db.BigInteger, db.ForeignKey(
+        'temperature.ticker'), nullable=False)
+    gas = db.relationship("Gas", backref=db.backref(
+        "env_alert", uselist=False), lazy=True)
+    temperature = db.relationship("Temperature", backref=db.backref(
+        "env_alert", uselist=False), lazy=True)
 
     def __str__(self):
         return f'Alert at {self.alert_time}'
+
 
 class Temperature(db.Model):
     __tablename__ = 'temperature'
 
     ticker = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     value = db.Column(db.Float, nullable=False)
-    capture_time = db.Column(db.DateTime, default=datetime.now, unique=True, nullable=False)
+    capture_time = db.Column(
+        db.DateTime, default=datetime.now, unique=True, nullable=False)
 
     def __repr__(self):
         return '<Temp Tick %r>' % self.ticker
+
 
 class Gas(db.Model):
     __tablename__ = 'gas'
@@ -73,7 +80,8 @@ class Gas(db.Model):
     lpg = db.Column(db.Float, nullable=False)
     co = db.Column(db.Float, nullable=False)
     smoke = db.Column(db.Float, nullable=False)
-    capture_time = db.Column(db.DateTime, default=datetime.now, unique=True, nullable=False)
+    capture_time = db.Column(
+        db.DateTime, default=datetime.now, unique=True, nullable=False)
 
     def __repr__(self):
         return '<Gas Tick %r>' % self.ticker

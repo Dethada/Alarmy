@@ -8,6 +8,7 @@ class GasType(SQLAlchemyObjectType):
         model = Gas
         interfaces = (graphene.relay.Node, )
 
+
 class CustomGasType(graphene.ObjectType):
     capture_time = graphene.NonNull(graphene.types.datetime.DateTime)
     lpg = graphene.NonNull(graphene.Float)

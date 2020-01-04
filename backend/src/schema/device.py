@@ -3,7 +3,6 @@ from graphene_sqlalchemy import SQLAlchemyObjectType
 from src.models import Device
 from src.extensions import socketio
 from src.extensions import db
-from flask_jwt_extended import jwt_required
 
 
 class DeviceType(SQLAlchemyObjectType):
@@ -13,7 +12,6 @@ class DeviceType(SQLAlchemyObjectType):
 
 class UpdateDeviceMutation(graphene.Mutation):
     class Arguments:
-        # The input arguments for this mutation
         poll_interval = graphene.Int()
         alert_interval = graphene.Int()
         alarm_duration = graphene.Int()
@@ -25,7 +23,6 @@ class UpdateDeviceMutation(graphene.Mutation):
         detect_humans = graphene.Boolean()
         temp_threshold = graphene.Int()
 
-    # The class attributes define the response of the mutation
     device = graphene.Field(DeviceType)
 
     def mutate(self, info, poll_interval=None, alert_interval=None, alarm_duration=None, alarm=None, email=None, vflip=None, motd=None, alarm_code=None, detect_humans=None, temp_threshold=None):
