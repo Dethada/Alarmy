@@ -23,11 +23,12 @@ class UpdateDeviceMutation(graphene.Mutation):
         motd = graphene.String()
         alarm_code = graphene.String()
         detect_humans = graphene.Boolean()
+        temp_threshold = graphene.Int()
 
     # The class attributes define the response of the mutation
     device = graphene.Field(DeviceType)
 
-    def mutate(self, info, poll_interval=None, alert_interval=None, alarm_duration=None, alarm=None, email=None, vflip=None, motd=None, alarm_code=None, detect_humans=None):
+    def mutate(self, info, poll_interval=None, alert_interval=None, alarm_duration=None, alarm=None, email=None, vflip=None, motd=None, alarm_code=None, detect_humans=None, temp_threshold=None):
         device = Device.query.first()
         if poll_interval:
             device.poll_interval = poll_interval
@@ -41,6 +42,8 @@ class UpdateDeviceMutation(graphene.Mutation):
             device.motd = motd
         if alarm_code:
             device.alarm_code = alarm_code
+        if temp_threshold:
+            device.temp_threshold = temp_threshold
         if alarm is not None:
             device.alarm = alarm
         if vflip is not None:

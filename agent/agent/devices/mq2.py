@@ -2,10 +2,8 @@
 #!/usr/bin/env python3
 
 # adapted from https://github.com/tutRPi/Raspberry-Pi-Gas-Sensor-MQ/blob/master/mq.py
-import os
-import time
+from time import sleep
 import math
-from utils import nanpy_connect
 from config import config
 
 
@@ -96,7 +94,7 @@ class MQ2():
         val = 0.0
         for i in range(self.CALIBARAION_SAMPLE_TIMES):          # take multiple samples
             val += self.MQResistanceCalculation(self._read())
-            time.sleep(self.CALIBRATION_SAMPLE_INTERVAL/1000.0)
+            sleep(self.CALIBRATION_SAMPLE_INTERVAL/1000.0)
 
         # calculate the average value
         val = val/self.CALIBARAION_SAMPLE_TIMES
@@ -121,7 +119,7 @@ class MQ2():
 
         for i in range(self.READ_SAMPLE_TIMES):
             rs += self.MQResistanceCalculation(self._read())
-            time.sleep(self.READ_SAMPLE_INTERVAL/1000.0)
+            sleep(self.READ_SAMPLE_INTERVAL/1000.0)
 
         rs = rs/self.READ_SAMPLE_TIMES
 

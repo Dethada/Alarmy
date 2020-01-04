@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import os
-import json
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Mail, Attachment, FileContent, FileName,

@@ -2,12 +2,10 @@
 from time import sleep
 from datetime import datetime
 import threading
-from gpiozero import DigitalInputDevice
-from utils import Thread, reload_config
-from notifyer import broadcast_mail
-from events import ws_notify_users, new_values
-from detection import detect_person_frame, detect_humans
-import db
+from utils.general import Thread, reload_config
+from utils.sensor import trigger_env_alert, new_values
+from devices.detection import detect_humans
+from db import session
 import models
 from config import config
 from devices import arduino, mq, keylock, hwalert, mq2_alert
@@ -27,9 +25,9 @@ def get_gases():
 
 def store_env_data(gas, temp):
     with lock:
-        db.session.add(gas)
-        db.session.add(temp)
-        db.session.commit()
+        session.add(gas)
+        session.add(temp)
+        session.commit()
 
 
 def insert_current_data():
@@ -50,15 +48,15 @@ def insert_alert_data(reason):
     print('Temp: {0:.2f} C'.format(temp_c))
     print(gas)
     store_env_data(gas, temp)
-    gas_ticker = db.session.query(models.Gas).filter(
+    gas_ticker = session.query(models.Gas).filter(
         models.Gas.capture_time == current_time).first().ticker
-    temp_ticker = db.session.query(models.Temperature).filter(
+    temp_ticker = session.query(models.Temperature).filter(
         models.Temperature.capture_time == current_time).first().ticker
     envalert = models.EnvAlert(
         reason=reason, gas_ticker=gas_ticker, temp_ticker=temp_ticker, alert_time=current_time)
     with lock:
-        db.session.add(envalert)
-        db.session.commit()
+        session.add(envalert)
+        session.commit()
     return {'time': current_time, 'gas': gas, 'temp': temp}
 
 
@@ -68,13 +66,8 @@ def watch_gas_alerts():
         print('Alert')
         reason = 'Gases Detected'
         info = insert_alert_data(reason)
-        msg = {'subject': 'Gases Detected',
-               'content': f'Time: {info["time"]}<br>Temp: {round(info["temp"].value, 2)} LPG: {round(info["gas"].lpg, 5)} CO: {round(info["gas"].co, 5)} Smoke: {round(info["gas"].smoke, 5)}'}
-        ws_notify_users('Gases Detected')
-        broadcast_mail(msg)
-        device = db.session.query(models.Device).first()
-        device.alarm = True
-        db.session.commit()
+        trigger_env_alert(reason, info["time"], info["temp"].value,
+                          info["gas"].lpg, info["gas"].co, info["gas"].smoke)
         hwalert.run_for(reason, config.ALARM_DURATION)
         sleep(config.ALERT_INTERVAL)
 
@@ -86,6 +79,19 @@ def poll_env_data():
         sleep(config.POLL_INTERVAL)
 
 
+def watch_temp():
+    while True:
+        temp = get_temp()
+        if temp > config.TEMP_THRESHOLD:
+            reason = 'High Temperature'
+            print(reason)
+            info = insert_alert_data(reason)
+            trigger_env_alert(reason, info["time"], info["temp"].value,
+                              info["gas"].lpg, info["gas"].co, info["gas"].smoke)
+            sleep(config.ALERT_INTERVAL)
+        sleep(1)
+
+
 def main():
     device = reload_config()
     if device.alarm:
@@ -93,6 +99,7 @@ def main():
     gas_alerts_thread = Thread(watch_gas_alerts)
     poll_env_thread = Thread(poll_env_data)
     human_thread = Thread(detect_humans)
+    temp_thread = Thread(watch_temp)
     keylock.start()
 
 

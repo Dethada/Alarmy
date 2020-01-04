@@ -1,6 +1,6 @@
+from datetime import datetime
 from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean, Text, Integer
 from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -31,6 +31,7 @@ class Device(Base):
     motd = Column(String(32), nullable=False)
     alarm_code = Column(String(16), nullable=False)
     detect_humans = Column(Boolean, default=False, nullable=False)
+    temp_threshold = Column(Integer, nullable=False)
 
 
 class PersonAlert(Base):

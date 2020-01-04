@@ -1,12 +1,11 @@
-import sys
-import time
+from time import sleep
 import adafruit_matrixkeypad
 from digitalio import DigitalInOut
 import board
 from models import Device
-from config import config
 from db import session
-from utils import Thread
+from utils.general import Thread
+from config import config
 
 
 class KeyLock():
@@ -51,7 +50,7 @@ class KeyLock():
             session.commit()
         else:
             self.lcd.text('Incorrect!', 2)
-            time.sleep(1)
+            sleep(1)
             self.clear()
 
     def check_keypad_input(self):
@@ -64,7 +63,7 @@ class KeyLock():
                     self.authenticate()
                 else:
                     self.enter_key(keys[0])
-                time.sleep(0.2)
+                sleep(0.2)
     
     def start(self):
         self.thread = Thread(self.check_keypad_input)

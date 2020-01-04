@@ -1,5 +1,5 @@
 from time import sleep
-from utils import Thread
+from utils.general import Thread
 from db import session
 from models import Device
 from config import config

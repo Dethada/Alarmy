@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
-# Modified from
-# https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/TFLite_detection_image.py
+# Adapted from https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/TFLite_detection_image.py
 import os
 import cv2
-import numpy as np
-from tensorflow.lite.python.interpreter import Interpreter
 from datetime import datetime
 from base64 import b64encode
-from models import PersonAlert, Device
-from notifyer import broadcast_mail
-from events import ws_notify_users
-from db import session
-from devices import hwalert, pir
-from config import config
 from time import sleep
+import numpy as np
+from tensorflow.lite.python.interpreter import Interpreter
+from models import PersonAlert
+from utils.notifyer import broadcast_mail
+from db import session
+from devices import hwalert, pir, capture
+from utils.sensor import trigger_alert_helper
+from config import config
 
 MODEL_NAME = 'ssd_mobilenet/'
 GRAPH_NAME = 'detect.tflite'
@@ -54,9 +53,6 @@ floating_model = (input_details[0]['dtype'] == np.float32)
 
 input_mean = 127.5
 input_std = 127.5
-
-cap = cv2.VideoCapture(0)
-# cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
 def detect_person_frame(image):
     # Load image and resize to expected shape [1xHxWx3]
@@ -113,9 +109,8 @@ def insert_data(img_data):
 
 def verify_person():
     if not config.DETECT_HUMANS:
-        print('Aborted')
         return
-    _, frame = cap.read()
+    _, frame = capture.read()
     if config.VFLIP:
         frame = cv2.flip(frame, 0)
     res = detect_person_frame(frame)
@@ -127,12 +122,9 @@ def verify_person():
         alert_time = insert_data(img_data)
         print('Person detected')
         msg = {'subject': 'Person detected', 'content': f'Person detected at {alert_time}<br><img src="cid:defaultcid"/>', 'img_attachment': img_data}
-        ws_notify_users('Person detected!')
-        device = session.query(Device).first()
-        device.alarm= True
-        session.commit()
-        hwalert.run_for('Person Detected', config.ALARM_DURATION)
         broadcast_mail(msg)
+        trigger_alert_helper('Person detected!')
+        hwalert.run_for('Person Detected', config.ALARM_DURATION)
         sleep(config.ALERT_INTERVAL)
 
 
@@ -141,4 +133,4 @@ def detect_humans():
 
     # clear the camera buffer
     while True:
-        cap.read()
+        capture.read()

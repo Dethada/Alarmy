@@ -1,8 +1,7 @@
 import socketio
 from devices import hwalert
-from db import session
 from models import Device
-from utils import reload_config
+from utils.general import reload_config
 from config import config
 
 sio = socketio.Client()
@@ -21,9 +20,3 @@ def update_device(msg):
         hwalert.on('Web Triggered')
     else:
         hwalert.stop_alert()
-
-def ws_notify_users(msg):
-    sio.emit('alert_users', msg, namespace='/alert')
-
-def new_values():
-    sio.emit('new_values', '', namespace='/alert')

@@ -28,6 +28,7 @@ class Device(db.Model):
     motd = db.Column(db.String(32), nullable=False)
     alarm_code = db.Column(db.String(16), nullable=False)
     detect_humans = db.Column(db.Boolean, nullable=False)
+    temp_threshold = db.Column(db.Integer, nullable=False)
 
 
 class PersonAlert(db.Model):
