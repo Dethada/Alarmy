@@ -33,6 +33,7 @@ const actions = {
     snackbar.show = true
     snackbar.text = text
     snackbar.color = "orange"
+    snackbar.timeout = 0
     commit('setSnack', snackbar)
   },
   closeSnackbar({ commit, state }) {

@@ -7,6 +7,15 @@
           <v-text-field v-model="deviceInfo.alertInterval" label="Alert Interval"></v-text-field>
           <v-text-field v-model="deviceInfo.alarmDuration" label="Alarm Duration"></v-text-field>
           <v-text-field v-model="deviceInfo.email" label="From Email"></v-text-field>
+          <v-text-field v-model="deviceInfo.motd" counter=32 label="Message of the Day"></v-text-field>
+          <v-text-field
+            v-model="deviceInfo.alarmCode"
+            :type="visibleCode ? 'text' : 'password'"
+            :append-icon="visibleCode ? 'visibility_off' : 'visibility'"
+            @click:append="() => (visibleCode = !visibleCode)"
+            counter=16
+            label="Alarm Code"
+          ></v-text-field>
           <v-switch v-model="deviceInfo.alarm" class="ma-2" label="Toggle Alarm"></v-switch>
           <v-switch v-model="deviceInfo.vflip" class="ma-2" label="Vertically flip camera"></v-switch>
           <v-btn class="mr-4" type="submit">submit</v-btn>
@@ -17,8 +26,8 @@
 </template>
 
 <script>
-import gql from "graphql-tag"
-import { mapActions } from "vuex"
+import gql from "graphql-tag";
+import { mapActions } from "vuex";
 
 export default {
   name: "Device",
@@ -32,15 +41,23 @@ export default {
           alarmDuration
           email
           vflip
+          motd
+          alarmCode
         }
       }
     `
   },
 
+  data() {
+    return {
+      visibleCode: false
+    };
+  },
+
   methods: {
-      ...mapActions(['sendError', 'sendSuccess']),
+    ...mapActions(["sendError", "sendSuccess"]),
     updateDeviceSettings: function() {
-       this.$apollo
+      this.$apollo
         .mutate({
           // Query
           mutation: gql`
@@ -51,6 +68,8 @@ export default {
               $alarm: Boolean
               $email: String
               $vflip: Boolean
+              $motd: String
+              $alarmCode: String
             ) {
               updateDevice(
                 pollInterval: $pollInterval
@@ -59,6 +78,8 @@ export default {
                 alarm: $alarm
                 email: $email
                 vflip: $vflip
+                motd: $motd
+                alarmCode: $alarmCode
               ) {
                 device {
                   alarm
@@ -73,6 +94,8 @@ export default {
             alarm: this.deviceInfo.alarm,
             email: this.deviceInfo.email,
             vflip: this.deviceInfo.vflip,
+            motd: this.deviceInfo.motd,
+            alarmCode: this.deviceInfo.alarmCode
           }
         })
         .then(data => {
@@ -86,7 +109,6 @@ export default {
           console.error(error);
         });
     }
-    
-  },
+  }
 };
 </script>
