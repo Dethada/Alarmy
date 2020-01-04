@@ -5,14 +5,13 @@ import os
 import cv2
 import numpy as np
 from tensorflow.lite.python.interpreter import Interpreter
-from gpiozero import MotionSensor
 from datetime import datetime
 from base64 import b64encode
 from models import PersonAlert, Device
 from notifyer import broadcast_mail
 from events import ws_notify_users
 from db import session
-from hwalert import hwalert
+from devices import hwalert, pir
 from config import config
 from time import sleep
 
@@ -59,7 +58,6 @@ input_std = 127.5
 cap = cv2.VideoCapture(0)
 # cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
-# Loop over every image and perform detection
 def detect_person_frame(image):
     # Load image and resize to expected shape [1xHxWx3]
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -113,7 +111,10 @@ def insert_data(img_data):
     session.commit()
     return current_time
 
-def detect_person():
+def verify_person():
+    if not config.DETECT_HUMANS:
+        print('Aborted')
+        return
     _, frame = cap.read()
     if config.VFLIP:
         frame = cv2.flip(frame, 0)
@@ -136,10 +137,7 @@ def detect_person():
 
 
 def detect_humans():
-    pir=MotionSensor(config.MOTION_PIN, sample_rate = 5, queue_len = 1)
-    print('Started...')
-
-    pir.when_motion=detect_person
+    pir.when_motion=verify_person
 
     # clear the camera buffer
     while True:

@@ -27,6 +27,7 @@ class Device(db.Model):
     vflip = db.Column(db.Boolean, default=False, nullable=False)
     motd = db.Column(db.String(32), nullable=False)
     alarm_code = db.Column(db.String(16), nullable=False)
+    detect_humans = db.Column(db.Boolean, nullable=False)
 
 
 class PersonAlert(db.Model):

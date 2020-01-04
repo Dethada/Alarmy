@@ -22,11 +22,12 @@ class UpdateDeviceMutation(graphene.Mutation):
         vflip = graphene.Boolean()
         motd = graphene.String()
         alarm_code = graphene.String()
+        detect_humans = graphene.Boolean()
 
     # The class attributes define the response of the mutation
     device = graphene.Field(DeviceType)
 
-    def mutate(self, info, poll_interval=None, alert_interval=None, alarm_duration=None, alarm=None, email=None, vflip=None, motd=None, alarm_code=None):
+    def mutate(self, info, poll_interval=None, alert_interval=None, alarm_duration=None, alarm=None, email=None, vflip=None, motd=None, alarm_code=None, detect_humans=None):
         device = Device.query.first()
         if poll_interval:
             device.poll_interval = poll_interval
@@ -44,8 +45,10 @@ class UpdateDeviceMutation(graphene.Mutation):
             device.alarm = alarm
         if vflip is not None:
             device.vflip = vflip
+        if detect_humans is not None:
+            device.detect_humans = detect_humans
 
         db.session.commit()
         socketio.emit('update_device', '', broadcast=True, namespace='/device')
-        
+
         return UpdateDeviceMutation(device=device)

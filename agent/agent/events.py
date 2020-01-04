@@ -1,7 +1,8 @@
 import socketio
-from hwalert import hwalert
+from devices import hwalert
 from db import session
 from models import Device
+from utils import reload_config
 from config import config
 
 sio = socketio.Client()
@@ -15,15 +16,7 @@ def on_message(msg):
 
 @sio.on('update_device', namespace='/device')
 def update_device(msg):
-    device = session.query(Device).first()
-    config.POLL_INTERVAL = device.poll_interval
-    config.POLL_INTERVAL = device.poll_interval
-    config.ALARM_DURATION = device.alarm_duration
-    config.ALERT_INTERVAL = device.alert_interval
-    config.FROM_ADDR = device.email
-    config.VFLIP = device.vflip
-    config.MOTD = device.motd
-    config.KEYPAD_CODE = device.alarm_code
+    device = reload_config()
     if device.alarm:
         hwalert.on('Web Triggered')
     else:

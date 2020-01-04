@@ -6,3 +6,8 @@ Follow instructions [here](https://autottblog.wordpress.com/raspberry-pi-arduino
 ## Hardware Setup
 
 ![](diagrams/hardware_setup.png)
+
+## Test
+```
+pipenv run python3 -m unittest tests/mq2_test.py
+```

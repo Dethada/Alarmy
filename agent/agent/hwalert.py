@@ -1,14 +1,14 @@
 from time import sleep
-from rpi_lcd import LCD
-from gpiozero import Buzzer
 from utils import Thread
+from db import session
+from models import Device
 from config import config
 
 
 class HWAlert():
-    def __init__(self, buzzer_pin):
-        self.bz = Buzzer(buzzer_pin)
-        self.lcd = LCD()
+    def __init__(self, lcd, buzzer):
+        self.bz = buzzer
+        self.lcd = lcd
         self._stop = False
         self.thread = None
         self.msg = None
@@ -39,6 +39,9 @@ class HWAlert():
             for i in range(time):
                 sleep(1)
                 if self._stop:
+                    device = session.query(Device).first()
+                    device.alarm = False
+                    session.commit()
                     break
 
         self.off()
@@ -52,6 +55,3 @@ class HWAlert():
         if self.thread:
             self.thread.join()
         self.thread = None
-
-
-hwalert = HWAlert(config.BUZZER_PIN)

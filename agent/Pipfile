@@ -16,8 +16,6 @@ adafruit-circuitpython-matrixkeypad = "*"
 opencv-contrib-python = "==4.1.0.25"
 sqlalchemy = "*"
 psycopg2 = "*"
-paho-mqtt = "*"
-websocket-client = "*"
 python-socketio = {extras = ["client"],version = "*"}
 sendgrid = "*"
 tensorflow = {path = "./tensorflow-2.0.0-cp37-none-linux_armv7l.whl"}

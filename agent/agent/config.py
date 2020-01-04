@@ -19,5 +19,6 @@ class Config():
     KEYPAD_CODE = os.getenv('KEYPAD_CODE')
     MOTD = os.getenv('MOTD')
     VFLIP = False
+    DETECT_HUMANS = False
 
 config = Config()

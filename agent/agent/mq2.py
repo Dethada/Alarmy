@@ -12,7 +12,7 @@ from config import config
 class MQ2():
 
     ######################### Hardware Related Macros #########################
-    MQ_PIN = config.MQ2_PIN # define which analog input channel you are going to use
+     # define which analog input channel you are going to use
     RL_VALUE = 5        # define the load resistance on the board, in kilo ohms
     # RO_CLEAR_AIR_FACTOR=(Sensor resistance in clean air)/RO,
     RO_CLEAN_AIR_FACTOR = 9.83
@@ -35,9 +35,10 @@ class MQ2():
     GAS_CO = 1
     GAS_SMOKE = 2
 
-    def __init__(self, Ro=10):
+    def __init__(self, mq2_pin, arduino, Ro=10):
         self.Ro = Ro
-        self.arduino = nanpy_connect()
+        self.MQ_PIN = mq2_pin
+        self.arduino = arduino
         self.arduino.pinMode(self.MQ_PIN, self.arduino.INPUT)
 
         # two points are taken from the curve.
@@ -153,5 +154,3 @@ class MQ2():
     ############################################################################
     def MQGetPercentage(self, rs_ro_ratio, pcurve):
         return (math.pow(10, (((math.log(rs_ro_ratio)-pcurve[1]) / pcurve[2]) + pcurve[0])))
-
-mq = MQ2()
