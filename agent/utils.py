@@ -12,6 +12,3 @@ def nanpy_connect():
     connection = SerialManager(device='/dev/ttyUSB0')
     arduinoObject = ArduinoApi(connection=connection)
     return arduinoObject
-
-def publish_single(topic, msg):
-    publish.single(topic, msg, hostname="192.168.1.103")

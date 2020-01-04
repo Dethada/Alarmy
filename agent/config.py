@@ -16,6 +16,8 @@ class Config():
     DB_PASSWORD = os.getenv('DB_PASSWORD')
     DB_NAME = os.getenv('DB_NAME')
     SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
+    KEYPAD_CODE = os.getenv('KEYPAD_CODE')
+    MOTD = os.getenv('MOTD')
     VFLIP = False
 
 config = Config()

@@ -18,19 +18,21 @@ class User(db.Model):
 class Device(db.Model):
     __tablename__ = 'device'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cid = db.Column(db.Integer, primary_key=True, autoincrement=True)
     alarm = db.Column(db.Boolean, default=False, nullable=False)
     poll_interval = db.Column(db.Integer, nullable=False)
     alert_interval = db.Column(db.Integer, nullable=False)
     alarm_duration = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(320), nullable=False)
     vflip = db.Column(db.Boolean, default=False, nullable=False)
+    motd = db.Column(db.String(32), nullable=False)
+    alarm_code = db.Column(db.String(16), nullable=False)
 
 
 class PersonAlert(db.Model):
     __tablename__ = "person_alert"
 
-    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    cid = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     alert_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
     image = db.Column(db.Text, nullable=False)
 
@@ -41,7 +43,7 @@ class PersonAlert(db.Model):
 class EnvAlert(db.Model):
     __tablename__ = "env_alert"
 
-    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    cid = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     alert_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
     reason = db.Column(db.String(100), nullable=False)
     gas_ticker = db.Column(db.BigInteger, db.ForeignKey('gas.ticker'), nullable=False)

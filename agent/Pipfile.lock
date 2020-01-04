@@ -31,9 +31,9 @@
         },
         "adafruit-platformdetect": {
             "hashes": [
-                "sha256:b6fbcaf8fda006655a4ac3475c631cdd17831f2f6e1fb7eebcfcee591b1dec7c"
+                "sha256:bbed54aba726480eeb18602705bc8afbf651bef2d4d50f4e09055c44a33837a4"
             ],
-            "version": "==1.4.0"
+            "version": "==1.4.1"
         },
         "adafruit-pureio": {
             "hashes": [

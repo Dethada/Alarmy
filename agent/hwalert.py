@@ -11,15 +11,21 @@ class HWAlert():
         self.lcd = LCD()
         self._stop = False
         self.thread = None
+        self.msg = None
+        self.lcd.clear()
+        self.lcd.text(config.MOTD, 1)
 
     def on(self, msg):
+        self.msg = msg
         self.lcd.text('Alert', 1)
-        self.lcd.text(msg, 2)
+        self.lcd.text(self.msg, 2)
         self.bz.on()
 
     def off(self):
         self.bz.off()
+        self.msg = None
         self.lcd.clear()
+        self.lcd.text(config.MOTD, 1)
 
     def _run_for(self, msg, time=0):
         self._stop = False

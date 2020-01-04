@@ -22,8 +22,10 @@ def update_device(msg):
     config.ALERT_INTERVAL = device.alert_interval
     config.FROM_ADDR = device.email
     config.VFLIP = device.vflip
+    config.MOTD = device.motd
+    config.KEYPAD_CODE = device.alarm_code
     if device.alarm:
-        hwalert.on('')
+        hwalert.on('Web Triggered')
     else:
         hwalert.stop_alert()
 

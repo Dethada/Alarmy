@@ -25,6 +25,7 @@ gevent-websocket = "*"
 gunicorn = "*"
 eventlet = "*"
 flask-socketio = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.7"

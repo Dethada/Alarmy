@@ -21,19 +21,21 @@ class User(Base):
 class Device(Base):
     __tablename__ = 'device'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    cid = Column(Integer, primary_key=True, autoincrement=True)
     alarm = Column(Boolean, default=False, nullable=False)
     poll_interval = Column(Integer, nullable=False)
     alert_interval = Column(Integer, nullable=False)
     alarm_duration = Column(Integer, nullable=False)
     email = Column(String(320), nullable=False)
     vflip = Column(Boolean, default=False, nullable=False)
+    motd = Column(String(32), nullable=False)
+    alarm_code = Column(String(16), nullable=False)
 
 
 class PersonAlert(Base):
     __tablename__ = "person_alert"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    cid = Column(BigInteger, primary_key=True, autoincrement=True)
     alert_time = Column(DateTime, default=datetime.now, nullable=False)
     image = Column(Text, nullable=False)
 
@@ -44,7 +46,7 @@ class PersonAlert(Base):
 class EnvAlert(Base):
     __tablename__ = "env_alert"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    cid = Column(BigInteger, primary_key=True, autoincrement=True)
     alert_time = Column(DateTime, default=datetime.now, nullable=False)
     reason = Column(String(100), nullable=False)
     gas_ticker = Column(BigInteger, ForeignKey('gas.ticker'), nullable=False)

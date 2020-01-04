@@ -20,6 +20,7 @@ paho-mqtt = "*"
 websocket-client = "*"
 python-socketio = {extras = ["client"],version = "*"}
 sendgrid = "*"
+tensorflow = {path = "./tensorflow-2.0.0-cp37-none-linux_armv7l.whl"}
 
 [requires]
 python_version = "3.7"
