@@ -16,31 +16,27 @@ const routes = [
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Profile.vue')
+    component: () => import('../views/Profile.vue')
   },
   {
     path: '/manage/user',
     name: 'ManageUser',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/ManageUser.vue')
+    component: () => import('../views/ManageUser.vue')
   },
   {
     path: '/manage/device',
     name: 'ManageDevice',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/ManageDevice.vue')
+    component: () => import('../views/ManageDevice.vue')
+  },
+  {
+    path: '/alerts/detail',
+    name: 'AlertDetail',
+    component: () => import('../views/AlertDetail.vue')
   },
   {
     path: '/alerts',
     name: 'Alerts',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/Alerts.vue')
+    component: () => import('../views/Alerts.vue')
   },
 ]
 

@@ -1,38 +1,44 @@
 <template>
-  <!-- <v-container md>{{ allEnvalert }}</v-container> -->
   <v-container fluid fill-width>
-    <v-container fluid fill-width>
-      <v-data-table :headers="person_headers" :items="allPersonAlert" item-key="alertTime" class="elevation-1">
-        <template v-slot:top>
-          <v-toolbar flat color="white">
-            <v-toolbar-title>Person Alerts</v-toolbar-title>
-            <v-divider class="mx-4" inset vertical></v-divider>
-          </v-toolbar>
-        </template>
-        <template v-slot:item.alertTime="{ item }">
-          {{ formatTime(item.alertTime) }}
-        </template>
-        <template v-slot:item.image="{ item }">
-          <a v-bind:href="'data:image/jpeg;base64,'+item.image" target="_blank">View Image</a>
-        </template>
-        <template v-slot:item.action="{ item }">
-          <v-icon small>delete</v-icon>
-        </template>
-      </v-data-table>
-    </v-container>
-    <v-container fluid fill-width>
-      <v-data-table :headers="env_headers" :items="envAlertData" item-key="email" class="elevation-1">
-        <template v-slot:top>
-          <v-toolbar flat color="white">
-            <v-toolbar-title>Environment Alerts</v-toolbar-title>
-            <v-divider class="mx-4" inset vertical></v-divider>
-          </v-toolbar>
-        </template>
-        <template v-slot:item.action="{ item }">
-          <v-icon small>stop</v-icon>
-        </template>
-      </v-data-table>
-    </v-container>
+    <v-tabs v-model="tab" class="elevation-2">
+      <v-tabs-slider></v-tabs-slider>
+
+      <v-tab href="#person-tab">Person</v-tab>
+      <v-tab href="#env-tab">Environment</v-tab>
+
+      <v-tab-item value="person-tab">
+        <v-card flat tile>
+          <v-data-table
+            :headers="person_headers"
+            :items="allPersonAlert"
+            item-key="alertTime"
+            class="elevation-1"
+          >
+            <template v-slot:item.alertTime="{ item }">{{ formatTime(item.alertTime) }}</template>
+            <template v-slot:item.image="{ item }">
+              <v-icon @click="$router.push('/alerts/detail?cid=' + item.cid)">photo</v-icon>
+            </template>
+            <template v-slot:item.action="{ item }">
+              <v-icon small @click="deletePersonAlert(item)">delete</v-icon>
+            </template>
+          </v-data-table>
+        </v-card>
+      </v-tab-item>
+      <v-tab-item value="env-tab">
+        <v-card flat tile>
+          <v-data-table
+            :headers="env_headers"
+            :items="envAlertData"
+            item-key="email"
+            class="elevation-1"
+          >
+            <template v-slot:item.action="{ item }">
+              <v-icon small @click="deleteEnvAlert(item)">delete</v-icon>
+            </template>
+          </v-data-table>
+        </v-card>
+      </v-tab-item>
+    </v-tabs>
   </v-container>
 </template>
 
@@ -74,20 +80,22 @@ export default {
     allPersonAlert: {
       query: gql`
         query {
-            allPersonAlert {
-              edges {
-                node {
-                  alertTime
-                  image
-                }
+          allPersonAlert {
+            edges {
+              node {
+                alertTime
+                cid
               }
             }
           }
-        `,
-        update: data => {
-        return data.allPersonAlert.edges.map(function(edge) {
-          return edge.node;
-        }).reverse();
+        }
+      `,
+      update: data => {
+        return data.allPersonAlert.edges
+          .map(function(edge) {
+            return edge.node;
+          })
+          .reverse();
       }
     }
   },
@@ -107,7 +115,8 @@ export default {
       { text: "Image", value: "image" },
       { text: "Actions", value: "action", sortable: false }
     ],
-    allEnvalert: []
+    allEnvalert: [],
+    tab: null
   }),
 
   computed: {
@@ -130,36 +139,64 @@ export default {
   methods: {
     ...mapActions(["sendError", "sendSuccess"]),
     formatTime(time) {
-      return moment(time).format("YYYY-MM-DD hh:mm:ss")
+      return moment(time).format("YYYY-MM-DD hh:mm:ss");
     },
-    deleteUser(user) {
+    deletePersonAlert(alert) {
       this.$apollo
         .mutate({
           // Query
           mutation: gql`
-            mutation($email: String) {
-              deleteUser(email: $email) {
+            mutation($cid: Int!) {
+              deletePersonAlert(cid: $cid) {
                 result
               }
             }
           `,
           // Parameters
           variables: {
-            email: user.email
+            cid: alert.cid
           }
         })
         .then(data => {
-          this.sendSuccess("Deleted user");
+          this.sendSuccess("Deleted Alert");
+          this.$apollo.queries.allPersonAlert.refetch();
+          // Result
+          console.log(data);
+        })
+        .catch(error => {
+          this.sendError("Failed to delete alert");
+          // Error
+          console.error(error);
+        });
+    },
+    deleteEnvAlert(alert) {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: gql`
+            mutation($cid: Int!) {
+              deleteEnvAlert(cid: $cid) {
+                result
+              }
+            }
+          `,
+          // Parameters
+          variables: {
+            cid: alert.cid
+          }
+        })
+        .then(data => {
+          this.sendSuccess("Deleted Alert");
           this.$apollo.queries.allEnvalert.refetch();
           // Result
           console.log(data);
         })
         .catch(error => {
-          this.sendError("Failed to delete user");
+          this.sendError("Failed to delete alert");
           // Error
           console.error(error);
         });
-    }
+    },
   }
 };
 </script>

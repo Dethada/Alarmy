@@ -1,7 +1,0 @@
-query {
-    userInfo {
-        name
-        email
-        role
-    }
-}

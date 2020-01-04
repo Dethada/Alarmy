@@ -19,6 +19,7 @@ const actions = {
     snackbar.show = true
     snackbar.text = text
     snackbar.color = "pink"
+    snackbar.timeout = 5000
     commit('setSnack', snackbar)
   },
   sendSuccess({ commit, state }, text) {
@@ -26,6 +27,15 @@ const actions = {
     snackbar.show = true
     snackbar.text = text
     snackbar.color = "green"
+    snackbar.timeout = 5000
+    commit('setSnack', snackbar)
+  },
+  sendAlert({ commit, state }, text) {
+    let snackbar = state.snackbar
+    snackbar.show = true
+    snackbar.text = text
+    snackbar.color = "orange"
+    snackbar.timeout = 0
     commit('setSnack', snackbar)
   },
   closeSnackbar({ commit, state }) {
