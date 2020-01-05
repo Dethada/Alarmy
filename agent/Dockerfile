@@ -10,20 +10,12 @@ RUN apt install -y libpq-dev libpango-1.0-0 libatk1.0-0 libcairo-gobject2 libpan
 
 COPY pip.conf /etc/pip.conf
 RUN mkdir /root/agent
-RUn pip3 install pipenv
+RUN pip3 install pipenv
 WORKDIR /root/agent
-
-# RUN apk update && \
-#     apk add --virtual build-deps gcc musl-dev && \
-#     apk add postgresql-dev libffi-dev
-
-# Delete build dependencies
-# RUN apk del build-deps
 
 COPY Pipfile Pipfile.lock tensorflow-2.0.0-cp37-none-linux_armv7l.whl /root/agent/
 RUN pipenv install --skip-lock
 
-# RUN apt install -y libhdf5-dev libatlas-base-dev
 RUN rm -f /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Singapore /etc/localtime
 
 COPY agent /root/agent/agent
