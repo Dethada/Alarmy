@@ -88,6 +88,7 @@ def watch_temp():
             info = insert_alert_data(reason)
             trigger_env_alert(reason, info["time"], info["temp"].value,
                               info["gas"].lpg, info["gas"].co, info["gas"].smoke)
+            hwalert.run_for(reason, config.ALARM_DURATION)
             sleep(config.ALERT_INTERVAL)
         sleep(1)
 
