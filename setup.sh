@@ -1,6 +1,20 @@
 #!/bin/bash
 sudo apt update
 
+# Enable required intrefaces
+CAMERA=$(sudo raspi-config nonint get_camera)
+if [ "$CAMERA" == "1" ]; then
+    sudo raspi-config nonint do_camera 0
+fi
+SPI=$(sudo raspi-config nonint get_spi)
+if [ "$SPI" == "1" ]; then
+    sudo raspi-config nonint do_spi 0
+fi
+I2C=$(sudo raspi-config nonint get_i2c)
+if [ "$I2C" == "1" ]; then
+    sudo raspi-config nonint do_i2c 0
+fi
+
 # install python stuff
 sudo apt install -y python3-dev python3-pip
 sudo pip3 install pipenv
