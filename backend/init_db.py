@@ -27,6 +27,7 @@ class User(Base):
     name = Column(String(100), nullable=False)
     role = Column(String(10), default='user', nullable=False)
     password = Column(String(80), nullable=False)
+    get_alerts = Column(Boolean, default=False, nullable=False)
 
 
 class Device(Base):
