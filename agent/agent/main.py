@@ -8,7 +8,7 @@ from devices.detection import detect_humans
 from db import session
 import models
 from config import config
-from devices import arduino, mq, keylock, hwalert, mq2_alert
+from devices import arduino, mq, keylock, hwalert, mq2_alert, lcd
 
 
 lock = threading.Lock()
@@ -96,6 +96,8 @@ def main():
     device = reload_config()
     if device.alarm:
         hwalert.on('')
+    else:
+        lcd.text(config.MOTD, 1)
     gas_alerts_thread = Thread(watch_gas_alerts)
     poll_env_thread = Thread(poll_env_data)
     human_thread = Thread(detect_humans)

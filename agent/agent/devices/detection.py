@@ -134,3 +134,4 @@ def detect_humans():
     # clear the camera buffer
     while True:
         capture.read()
+        sleep(0.1)

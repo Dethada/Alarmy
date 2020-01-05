@@ -58,6 +58,7 @@ export default {
               node {
                 alertTime
                 reason
+                cid
                 gas {
                   lpg
                   co
@@ -129,7 +130,8 @@ export default {
           temperature: item.temperature.value.toFixed(2),
           lpg: item.gas.lpg.toFixed(5),
           co: item.gas.co.toFixed(5),
-          smoke: item.gas.smoke.toFixed(5)
+          smoke: item.gas.smoke.toFixed(5),
+          cid: item.cid,
         });
       });
       return x;

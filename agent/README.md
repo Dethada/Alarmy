@@ -1,7 +1,7 @@
 # Agent
 
 ## Nanpy Setup
-Follow instructions [here](https://autottblog.wordpress.com/raspberry-pi-arduino/controlling-arduino-from-raspberry-pi-with-nanpy/)
+Follow instructions [here](http://nanpy.github.io/#how-to-build-and-install)
 
 ## Hardware Setup
 

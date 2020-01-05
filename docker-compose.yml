@@ -6,14 +6,13 @@ services:
     build: frontend/
     restart: always
     ports:
-      - 8080:80
-      - 8443:443
+      - 80:80
 
   backend:
     build: backend/
-    restart: always
     depends_on:
       - postgres
+      - gateway
 
   postgres:
     build: postgres/
@@ -22,13 +21,13 @@ services:
       POSTGRES_PASSWORD: verysecurepassword123
     volumes:
       - v-postgres:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
 
   agent:
     build: agent/
     privileged: true
-    restart: always
+    depends_on:
+      - postgres
+      - backend
 
 volumes:
   v-postgres:

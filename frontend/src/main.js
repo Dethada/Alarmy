@@ -18,7 +18,7 @@ Vue.config.productionTip = false
 
 Vue.use(Chartkick.use(Chart))
 
-const baseURL = process.env.BASE_URL || 'http://192.168.1.103:5000';
+const baseURL = process.env.VUE_APP_BASE_URL || 'http://192.168.1.103:5000';
 
 const token = localStorage.getItem('token')
 const socket = io(baseURL + '/alert', {

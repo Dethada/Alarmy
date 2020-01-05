@@ -36,6 +36,6 @@ def get_emails():
 def broadcast_mail(msg):
     for addr in get_emails():
         if send_mail(config.FROM_ADDR, addr, msg['subject'], msg['content'], msg.get('img_attachment')):
-            print('Sent mail', msg)
+            print('Sent mail')
         else:
             print('Failed to send mail')

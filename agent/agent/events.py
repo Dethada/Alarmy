@@ -5,7 +5,7 @@ from utils.general import reload_config
 from config import config
 
 sio = socketio.Client()
-sio.connect('http://localhost:5000', namespaces=['/alert', '/device'])
+sio.connect(config.WS_HOST, namespaces=['/alert', '/device'])
 
 @sio.on('serverMsg', namespace='/alert')
 def on_message(msg):
