@@ -1,18 +1,23 @@
 #!/bin/bash
 sudo apt update
 
+REBOOT=0
+
 # Enable required intrefaces
 CAMERA=$(sudo raspi-config nonint get_camera)
 if [ "$CAMERA" == "1" ]; then
     sudo raspi-config nonint do_camera 0
+    REBOOT=1
 fi
 SPI=$(sudo raspi-config nonint get_spi)
 if [ "$SPI" == "1" ]; then
     sudo raspi-config nonint do_spi 0
+    REBOOT=1
 fi
 I2C=$(sudo raspi-config nonint get_i2c)
 if [ "$I2C" == "1" ]; then
     sudo raspi-config nonint do_i2c 0
+    REBOOT=1
 fi
 
 # install python stuff
@@ -62,3 +67,7 @@ cd -
 
 # build all the services
 sudo docker-compose build
+
+if [ $REBOOT -eq 1 ]; then
+    echo 'Please reboot your Pi before continuing'
+fi
