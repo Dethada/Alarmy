@@ -10,6 +10,7 @@ from tensorflow.lite.python.interpreter import Interpreter
 from models import PersonAlert
 from utils.notifyer import broadcast_mail
 from db import session
+from utils.general import publish, get_current_time
 from devices import hwalert, pir, capture
 from utils.sensor import trigger_alert_helper
 from config import config
@@ -101,8 +102,9 @@ def detect_person_frame(image):
     return None
 
 def insert_data(img_data):
-    current_time = datetime.now()
+    current_time = get_current_time()
     person_alert = PersonAlert(image=img_data, alert_time=current_time)
+    publish("alerts/person", {"time":current_time, "image": img_data})
     session.add(person_alert)
     session.commit()
     return current_time

@@ -24,6 +24,8 @@ psycopg2 = "*"
 python-socketio = {extras = ["client"],version = "*"}
 sendgrid = "*"
 tensorflow = {path = "./tensorflow-2.0.0-cp37-none-linux_armv7l.whl"}
+paho-mqtt = "*"
+pyjwt = "*"
 
 [requires]
 python_version = "3.7"

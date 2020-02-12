@@ -1,18 +1,9 @@
 from db import session
 from models import Device
 from .notifyer import broadcast_mail
-from events import sio
-
-def ws_notify_users(msg):
-    sio.emit('alert_users', msg, namespace='/alert')
-
-def new_values():
-    sio.emit('new_values', '', namespace='/alert')
 
 
 def trigger_alert_helper(msg):
-    ws_notify_users(msg)
-    new_values()
     device = session.query(Device).first()
     device.alarm = True
     session.commit()

@@ -17,6 +17,7 @@ class Config():
     DB_PASSWORD = os.getenv('DB_PASSWORD')
     DB_NAME = os.getenv('DB_NAME')
     WS_HOST = os.getenv('WS_HOST')
+    DEVICE_ID = 'device1'
     SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
     FROM_ADDR = 'alarmy@example.com'
     KEYPAD_CODE = '1234'

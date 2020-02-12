@@ -1,5 +1,8 @@
+import json
 import threading
+from datetime import datetime
 from db import session
+from comms import mqttc
 from config import config
 from models import Device
 
@@ -22,3 +25,9 @@ def reload_config():
     config.DETECT_HUMANS = device.detect_humans
     config.TEMP_THRESHOLD = device.temp_threshold
     return device
+
+def publish(topic, data):
+    mqttc.publish(f"devices/{config.DEVICE_ID}/{topic}", json.dumps(data))
+
+def get_current_time():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
