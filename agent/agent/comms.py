@@ -1,5 +1,6 @@
 import datetime
 import logging
+import json
 import os
 import random
 import ssl
@@ -27,8 +28,8 @@ def on_connect(mqttc, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    mqttc.subscribe(config['CONFIG_TOPIC'], qos=0)
-    mqttc.subscribe(config['ALERT_TOPIC'], qos=0)
+    mqttc.subscribe(config['TMP']['CONFIG_TOPIC'], qos=0)
+    mqttc.subscribe(config['TMP']['ALERT_TOPIC'], qos=0)
 
 # The callback for when a PUBLISH message is received from the server.
 # def on_message(mqttc, userdata, msg):
@@ -49,9 +50,13 @@ def get_client():
 
     return client
 
+
 mqttc = get_client()
 mqttc.on_connect = on_connect
 mqttc.on_message = message_handler
+
+def publish(topic, data):
+    mqttc.publish(f"{config['TMP']['DEVICE_TOPIC']}{topic}", json.dumps(data))
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.

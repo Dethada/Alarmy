@@ -2,7 +2,7 @@ from time import sleep
 import adafruit_matrixkeypad
 from digitalio import DigitalInOut
 import board
-from utils.general import Thread, write_config, reload_config
+from utils import Thread, write_config, reload_config
 from config import config
 
 

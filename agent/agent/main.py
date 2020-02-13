@@ -2,7 +2,8 @@
 from time import sleep
 from datetime import datetime
 import threading
-from utils.general import Thread, reload_config, publish, get_current_time
+from utils import Thread, reload_config, get_current_time
+from comms import publish
 from devices.detection import detect_humans
 from config import config
 from devices import arduino, mq, keylock, hwalert, mq2_alert, lcd

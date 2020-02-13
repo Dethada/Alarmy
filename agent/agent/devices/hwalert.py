@@ -1,5 +1,5 @@
 from time import sleep
-from utils.general import Thread, write_config
+from utils import Thread, write_config
 from config import config
 
 
@@ -32,6 +32,8 @@ class HWAlert():
             while True:
                 sleep(1)
                 if self._stop:
+                    config['ALARM_ON'] = False
+                    write_config()
                     break
         else:
             for i in range(time):
