@@ -6,6 +6,8 @@ import ssl
 import time
 import jwt
 import paho.mqtt.client as mqtt
+from config import config
+from events import message_handler
 '''
 Registry ID: CA2-Registry
 Region: asia-east1
@@ -25,7 +27,8 @@ def on_connect(mqttc, userdata, flags, rc):
 
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    # mqttc.subscribe("$SYS/#")
+    mqttc.subscribe(config['CONFIG_TOPIC'], qos=0)
+    mqttc.subscribe(config['ALERT_TOPIC'], qos=0)
 
 # The callback for when a PUBLISH message is received from the server.
 # def on_message(mqttc, userdata, msg):
@@ -44,19 +47,11 @@ def get_client():
     # # Connect to the Google MQTT bridge.
     client.connect('127.0.0.1', 1883)
 
-    # client.subscribe(mqtt_command_topic, qos=0)
-
     return client
-
-def on_message(unused_client, unused_userdata, message):
-    """Callback when the device receives a message on a subscription."""
-    payload = str(message.payload.decode('utf-8'))
-    print('Received message \'{}\' on topic \'{}\' with Qos {}'.format(
-            payload, message.topic, str(message.qos)))
 
 mqttc = get_client()
 mqttc.on_connect = on_connect
-mqttc.on_message = on_message
+mqttc.on_message = message_handler
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.

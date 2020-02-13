@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import sys
 import time
-from mq2 import MQ2
+from agent.devices import mq
 
 try:
     print("Press CTRL+C to abort.")
 
-    mq = MQ2()
     while True:
         perc = mq.MQPercentage()
         sys.stdout.write("\r")

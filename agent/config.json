@@ -1,1 +1,17 @@
-{"DEVICE_ID": "device1", "BUZZER_PIN": 21, "MQ2_APIN": 0, "MQ2_DPIN": 26, "LM35_PIN": 1, "MOTION_PIN": 13, "ALARM_DURATION": 60, "POLL_INTERVAL": 60, "ALERT_INTERVAL": 60, "TEMP_THRESHOLD": 50, "KEYPAD_CODE": "1234", "MOTD": "MOTD", "VFLIP": false, "DETECT_HUMANS": false, "ALARM_ON": false}
+{
+  "DEVICE_ID": "device1",
+  "BUZZER_PIN": 21,
+  "MQ2_APIN": 0,
+  "MQ2_DPIN": 26,
+  "LM35_PIN": 1,
+  "MOTION_PIN": 13,
+  "ALARM_DURATION": 60,
+  "POLL_INTERVAL": 60,
+  "ALERT_INTERVAL": 60,
+  "TEMP_THRESHOLD": 50,
+  "KEYPAD_CODE": "1234",
+  "MOTD": "bye",
+  "VFLIP": false,
+  "DETECT_HUMANS": false,
+  "ALARM_ON": false
+}
