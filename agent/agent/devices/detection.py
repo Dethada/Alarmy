@@ -110,10 +110,10 @@ def insert_data(img_data):
     return current_time
 
 def verify_person():
-    if not config.DETECT_HUMANS:
+    if not config['DETECT_HUMANS']:
         return
     _, frame = capture.read()
-    if config.VFLIP:
+    if config['VFLIP']:
         frame = cv2.flip(frame, 0)
     res = detect_person_frame(frame)
     if res is not None:
@@ -126,8 +126,8 @@ def verify_person():
         msg = {'subject': 'Person detected', 'content': f'Person detected at {alert_time}<br><img src="cid:defaultcid"/>', 'img_attachment': img_data}
         broadcast_mail(msg)
         trigger_alert_helper('Person detected!')
-        hwalert.run_for('Person Detected', config.ALARM_DURATION)
-        sleep(config.ALERT_INTERVAL)
+        hwalert.run_for('Person Detected', config['ALARM_DURATION'])
+        sleep(config['ALERT_INTERVAL'])
 
 
 def detect_humans():

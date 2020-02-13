@@ -1,7 +1,5 @@
 from time import sleep
-from utils.general import Thread
-from db import session
-from models import Device
+from utils.general import Thread, write_config
 from config import config
 
 
@@ -13,7 +11,7 @@ class HWAlert():
         self.thread = None
         self.msg = None
         self.lcd.clear()
-        self.lcd.text(config.MOTD, 1)
+        self.lcd.text(config['MOTD'], 1)
 
     def on(self, msg):
         self.msg = msg
@@ -25,7 +23,7 @@ class HWAlert():
         self.bz.off()
         self.msg = None
         self.lcd.clear()
-        self.lcd.text(config.MOTD, 1)
+        self.lcd.text(config['MOTD'], 1)
 
     def _run_for(self, msg, time=0):
         self._stop = False
@@ -39,9 +37,8 @@ class HWAlert():
             for i in range(time):
                 sleep(1)
                 if self._stop:
-                    device = session.query(Device).first()
-                    device.alarm = False
-                    session.commit()
+                    config['ALARM_ON'] = False
+                    write_config()
                     break
 
         self.off()

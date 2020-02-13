@@ -4,7 +4,6 @@ from datetime import datetime
 import threading
 from utils.general import Thread, reload_config, publish, get_current_time
 from devices.detection import detect_humans
-from db import session
 from config import config
 from devices import arduino, mq, keylock, hwalert, mq2_alert, lcd
 
@@ -13,7 +12,7 @@ lock = threading.Lock()
 
 
 def get_temp():
-    return (arduino.analogRead(config.LM35_PIN) * 500) / 1024
+    return (arduino.analogRead(config['LM35_PIN']) * 500) / 1024
 
 
 def get_gases():
@@ -37,7 +36,7 @@ def insert_current_data():
 def poll_env_data():
     while True:
         insert_current_data()
-        sleep(config.POLL_INTERVAL)
+        sleep(config['POLL_INTERVAL'])
 
 
 def insert_alert_data(type):
@@ -57,27 +56,26 @@ def watch_gas_alerts():
         mq2_alert.wait_for_active()
         reason = 'Gases Detected'
         info = insert_alert_data('gas')
-        hwalert.run_for(reason, config.ALARM_DURATION)
-        sleep(config.ALERT_INTERVAL)
+        hwalert.run_for(reason, config['ALARM_DURATION'])
+        sleep(config['ALERT_INTERVAL'])
 
 
 def watch_temp():
     while True:
         temp = get_temp()
-        if temp > config.TEMP_THRESHOLD:
+        if temp > config['TEMP_THRESHOLD']:
             reason = 'High Temperature'
             info = insert_alert_data('temp')
-            hwalert.run_for(reason, config.ALARM_DURATION)
-            sleep(config.ALERT_INTERVAL)
+            hwalert.run_for(reason, config['ALARM_DURATION'])
+            sleep(config['ALERT_INTERVAL'])
         sleep(1)
 
 
 def main():
-    device = reload_config()
-    if device.alarm:
+    if config['ALARM_ON']:
         hwalert.on('')
     else:
-        lcd.text(config.MOTD, 1)
+        lcd.text(config['MOTD'], 1)
     gas_alerts_thread = Thread(watch_gas_alerts)
     poll_env_thread = Thread(poll_env_data)
     human_thread = Thread(detect_humans)

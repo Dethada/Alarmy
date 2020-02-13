@@ -1,10 +1,8 @@
 import json
 import threading
 from datetime import datetime
-from db import session
 from comms import mqttc
 from config import config
-from models import Device
 
 class Thread(threading.Thread):
     def __init__(self, t, *args):
@@ -13,18 +11,30 @@ class Thread(threading.Thread):
 
 
 def reload_config():
-    device = session.query(Device).first()
-    config.POLL_INTERVAL = device.poll_interval
-    config.POLL_INTERVAL = device.poll_interval
-    config.ALARM_DURATION = device.alarm_duration
-    config.ALERT_INTERVAL = device.alert_interval
-    config.FROM_ADDR = device.email
-    config.VFLIP = device.vflip
-    config.MOTD = device.motd
-    config.KEYPAD_CODE = device.alarm_code
-    config.DETECT_HUMANS = device.detect_humans
-    config.TEMP_THRESHOLD = device.temp_threshold
-    return device
+    '''
+    {
+        'BUZZER_PIN': 21,
+        'MQ2_APIN': 0,
+        'MQ2_DPIN': 26,
+        'LM35_PIN': 1,
+        'MOTION_PIN': 13,
+        'ALARM_DURATION': 60,
+        'POLL_INTERVAL': 60,
+        'ALERT_INTERVAL': 60,
+        'TEMP_THRESHOLD': 50,
+        'KEYPAD_CODE': '1234',
+        'MOTD': 'MOTD',
+        'VFLIP': False,
+        'DETECT_HUMANS': False,
+    }
+    '''
+    with open('config.json') as json_file:
+        config = json.load(json_file)
+        return config
+
+def write_config():
+    with open('config.json', 'w', encoding='utf-8') as f:
+        json.dump(config, f, ensure_ascii=False, indent=2)
 
 def publish(topic, data):
     mqttc.publish(f"devices/{config.DEVICE_ID}/{topic}", json.dumps(data))
