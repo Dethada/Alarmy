@@ -37,7 +37,7 @@ def write_config():
         json.dump(config, f, ensure_ascii=False, indent=2)
 
 def publish(topic, data):
-    mqttc.publish(f"devices/{config.DEVICE_ID}/{topic}", json.dumps(data))
+    mqttc.publish(f"devices/{config['DEVICE_ID']}/{topic}", json.dumps(data))
 
 def get_current_time():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
