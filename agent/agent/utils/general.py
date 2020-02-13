@@ -30,7 +30,7 @@ def reload_config():
     '''
     with open('config.json') as json_file:
         config = json.load(json_file)
-        return config
+    return config
 
 def write_config():
     with open('config.json', 'w', encoding='utf-8') as f:

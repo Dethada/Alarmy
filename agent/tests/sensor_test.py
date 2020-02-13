@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import json
 from time import sleep
 from gpiozero import Buzzer
 from gpiozero import MotionSensor
@@ -9,13 +10,14 @@ from rpi_lcd import LCD
 import adafruit_matrixkeypad
 import board
 from digitalio import DigitalInOut
-from dotenv import load_dotenv, find_dotenv
-load_dotenv(find_dotenv())
 
-BUZZER_PIN = os.getenv('BUZZER_PIN')
-MQ2_PIN = os.getenv('MQ2_PIN')
-LM35_PIN = os.getenv('LM35_PIN')
-MOTION_PIN = os.getenv('MOTION_PIN')
+with open('config.json') as json_file:
+    config = json.load(json_file)
+
+BUZZER_PIN = config['BUZZER_PIN']
+MQ2_PIN = config['MQ2_APIN']
+LM35_PIN = config['LM35_PIN']
+MOTION_PIN = config['MOTION_PIN']
 
 
 def nanpy_connect():
