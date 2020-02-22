@@ -57,15 +57,11 @@ def create_jwt(project_id, private_key_file, algorithm):
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(mqttc, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    mqttc.subscribe(config['TMP']['CONFIG_TOPIC'], qos=0)
+    attach_device(mqttc,config['DEVICE_ID'],'')
+    gateway_config_topic = '/devices/{}/config'.format("mqtt-gateway")
+    mqttc.subscribe(gateway_config_topic, qos=1)
+    mqttc.subscribe(config['TMP']['CONFIG_TOPIC'], qos=1)
     mqttc.subscribe(config['TMP']['ALERT_TOPIC'], qos=0)
-
-# The callback for when a PUBLISH message is received from the server.
-# def on_message(mqttc, userdata, msg):
-#     print(msg.topic+" "+str(msg.payload))
 
 def get_client():
     project_id, cloud_region, registry_id, gateway_id = config['PROJECT_ID'], config['REGION'], config['REGISTRY_ID'], config['GATEWAY_ID']
@@ -85,6 +81,8 @@ def get_client():
 
     # # Connect to the Google MQTT bridge.
     client.connect('mqtt.googleapis.com', 8883)
+    error_topic = '/devices/{}/errors'.format(gateway_id)
+    client.subscribe(error_topic, qos=0)
 
     return client
 
@@ -94,15 +92,21 @@ def attach_device(client, device_id, auth):
     attach_payload = '{{"authorization" : "{}"}}'.format(auth)
     client.publish(attach_topic, attach_payload, qos=1)
 
+def detach_device(client, device_id):
+    """Detach the device from the gateway."""
+    detach_topic = '/devices/{}/detach'.format(device_id)
+    print('Detaching: {}'.format(detach_topic))
+
 mqttc = get_client()
 mqttc.on_connect = on_connect
 mqttc.on_message = message_handler
-attach_device(mqttc,config['DEVICE_ID'],'')
 
 def publish(topic, data):
-    print(f"/{config['TMP']['DEVICE_TOPIC']}{topic}")
-    mqttc.publish(f"/{config['TMP']['DEVICE_TOPIC']}{topic}", json.dumps(data),qos=1)
-
+    device_id = config['DEVICE_ID']
+    attach_device(mqttc,device_id,'')
+    print(f"{config['TMP']['DEVICE_TOPIC']}{topic}")
+    mqttc.publish(f"{config['TMP']['DEVICE_TOPIC']}{topic}", json.dumps(data),qos=1)
+    detach_device(mqttc,device_id)
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
 # Other loop*() functions are available that give a threaded interface and a
