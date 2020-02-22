@@ -14,7 +14,8 @@ def upload_blob(data,timestamp):
     # Default credentials fix: https://stackoverflow.com/questions/42043611/could-not-load-the-default-credentials-node-js-google-compute-engine-tutorial
     storage_client = storage.Client()
     bucket = storage_client.bucket("alarmy-person-images")
-    filename = f"{timestamp}.jpg"
+    device_id = config['DEVICE_ID']
+    filename = f"{device_id}/{timestamp}.jpg"
     blob = bucket.blob(filename)
     blob.upload_from_string(data,content_type='image/jpeg')
     print("File uploaded to {}.".format(filename))
