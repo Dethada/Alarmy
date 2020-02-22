@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import graphene
 from graphene_sqlalchemy import SQLAlchemyConnectionField
 import pandas as pd
-from src.models import Device, Temperature, Gas, PersonAlert
+from src.models import Device, Temperature, Gas, PersonAlert, EnvAlert
 from src.schema.user import *
 from src.schema.gas import CustomGasType
 from src.schema.temp import CustomTempType
@@ -32,38 +32,61 @@ class Query(graphene.ObjectType):
     all_person_alert = SQLAlchemyConnectionField(PersonAlertType)
     person_alert = graphene.Field(
         PersonAlertType, cid=graphene.Int(required=True))
-    user_test = graphene.Field(UserType, email=graphene.String(required=True))
+    # user_test = graphene.Field(UserType, email=graphene.String(required=True))
 
     @jwt_required
     def resolve_user_info(self, info):
         return User.query.filter_by(email=get_jwt_identity()).first()
 
-    def resolve_user_test(self, info, email):
-        return User.query.filter_by(email=email).first()
-
+    @jwt_required
     def resolve_device_info(self, info):
-        return Device.query.first()
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        return user.device
+    
+    @jwt_required
+    def resolve_all_gas(self, info):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        return Gas.query.filter_by(device_id=user.device_id)
+    
+    @jwt_required
+    def resolve_all_temp(self, info):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        return Temperature.query.filter_by(device_id=user.device_id)
+    
+    @jwt_required
+    def resolve_all_envalert(self, info):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        return EnvAlert.query.filter_by(device_id=user.device_id)
+    
+    @jwt_required
+    def resolve_all_person_alert(self, info):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        return PersonAlert.query.filter_by(device_id=user.device_id)
 
+    @jwt_required
     def resolve_person_alert(self, info, cid):
-        return PersonAlert.query.filter_by(cid=cid).first()
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        return PersonAlert.query.filter_by(cid=cid,device_id=user.device_id).first()
 
+    @jwt_required
     def resolve_all_temp(self, info, duration=''):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
         if duration == '24H':
             since = datetime.now() - timedelta(hours=24)
             df = analysis_helper(Temperature.query.filter(
-                Temperature.capture_time > since).statement, 'H')
+                Temperature.device_id == user.device_id, Temperature.capture_time > since).statement, 'H')
             result = [CustomTempType(capture_time=time, value=value)
                       for time, value in zip(df.index, df['value'])]
         elif duration == '7D':
             since = datetime.now() - timedelta(days=7)
             df = analysis_helper(Temperature.query.filter(
-                Temperature.capture_time > since).statement, '4H')
+                Temperature.device_id == user.device_id, Temperature.capture_time > since).statement, '4H')
             result = [CustomTempType(capture_time=time, value=value)
                       for time, value in zip(df.index, df['value'])]
         elif duration == '30D':
             since = datetime.now() - timedelta(days=30)
             df = analysis_helper(Temperature.query.filter(
-                Temperature.capture_time > since).statement, 'D')
+                Temperature.device_id == user.device_id, Temperature.capture_time > since).statement, 'D')
             result = [CustomTempType(capture_time=time, value=value)
                       for time, value in zip(df.index, df['value'])]
         elif duration == 'ALL':
@@ -75,26 +98,28 @@ class Query(graphene.ObjectType):
                       for x in Temperature.query.order_by(Temperature.capture_time.desc()).limit(20)]
         return result
 
+    @jwt_required
     def resolve_all_gas(self, info, duration=''):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
         result = []
         if duration == '24H':
             since = datetime.now() - timedelta(hours=24)
             df = analysis_helper(Gas.query.filter(
-                Gas.capture_time > since).statement, 'H')
+                Gas.device_id == user.device_id, Gas.capture_time > since).statement, 'H')
             for row in df.itertuples():
                 result.append(CustomGasType(capture_time=row.Index,
                                             lpg=row.lpg, co=row.co, smoke=row.smoke))
         elif duration == '7D':
             since = datetime.now() - timedelta(days=7)
             df = analysis_helper(Gas.query.filter(
-                Gas.capture_time > since).statement, '4H')
+                Gas.device_id == user.device_id, Gas.capture_time > since).statement, '4H')
             for row in df.itertuples():
                 result.append(CustomGasType(capture_time=row.Index,
                                             lpg=row.lpg, co=row.co, smoke=row.smoke))
         elif duration == '30D':
             since = datetime.now() - timedelta(days=30)
             df = analysis_helper(Gas.query.filter(
-                Gas.capture_time > since).statement, 'D')
+                Gas.device_id == user.device_id, Gas.capture_time > since).statement, 'D')
             for row in df.itertuples():
                 result.append(CustomGasType(capture_time=row.Index,
                                             lpg=row.lpg, co=row.co, smoke=row.smoke))

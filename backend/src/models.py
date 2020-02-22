@@ -10,6 +10,9 @@ class User(db.Model):
     role = db.Column(db.String(10), default='user', nullable=False)
     password = db.Column(db.String(80), nullable=False)
     get_alerts = db.Column(db.Boolean, default=True, nullable=False)
+    device_id = db.Column(db.String(32), db.ForeignKey('device.device_id'), nullable=True)
+    device = db.relationship("Device", backref=db.backref(
+        "device", uselist=False), lazy=True)
 
     def __repr__(self):
         return '<User %r>' % self.email
@@ -18,7 +21,8 @@ class User(db.Model):
 class Device(db.Model):
     __tablename__ = 'device'
 
-    cid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # cid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    device_id = db.Column(db.String(32), primary_key=True)
     alarm = db.Column(db.Boolean, default=False, nullable=False)
     poll_interval = db.Column(db.Integer, nullable=False)
     alert_interval = db.Column(db.Integer, nullable=False)
@@ -35,6 +39,7 @@ class PersonAlert(db.Model):
     __tablename__ = "person_alert"
 
     cid = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    device_id = db.Column(db.String(32), db.ForeignKey('device.device_id'), nullable=False)
     alert_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
     image = db.Column(db.Text, nullable=False)
 
@@ -46,6 +51,7 @@ class EnvAlert(db.Model):
     __tablename__ = "env_alert"
 
     cid = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    device_id = db.Column(db.String(32), db.ForeignKey('device.device_id'), nullable=False)
     alert_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
     reason = db.Column(db.String(100), nullable=False)
     gas_ticker = db.Column(db.BigInteger, db.ForeignKey(
@@ -65,6 +71,7 @@ class Temperature(db.Model):
     __tablename__ = 'temperature'
 
     ticker = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    device_id = db.Column(db.String(32), db.ForeignKey('device.device_id'), nullable=False)
     value = db.Column(db.Float, nullable=False)
     capture_time = db.Column(
         db.DateTime, default=datetime.now, unique=True, nullable=False)
@@ -77,6 +84,7 @@ class Gas(db.Model):
     __tablename__ = 'gas'
 
     ticker = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    device_id = db.Column(db.String(32), db.ForeignKey('device.device_id'), nullable=False)
     lpg = db.Column(db.Float, nullable=False)
     co = db.Column(db.Float, nullable=False)
     smoke = db.Column(db.Float, nullable=False)
