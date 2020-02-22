@@ -104,17 +104,18 @@ def main(data, context):
     Returns:
         None; the output is written to Stackdriver Logging
     """
-
-    img_bytes = download_blob(data['bucket'], data['name'])
+    bucket_name,img_path = data['bucket'], data['name']
+    img_bytes = download_blob(bucket_name, img_path)
     if not detect_human(img_bytes):
-        delete_blob(data['bucket'], data['name'])
-        print("Blob {} deleted.".format(data['name']))
+        delete_blob(bucket_name, img_path)
+        print("Blob {} deleted.".format(img_path))
         return
-
+    device_id = img_path.split('/')[0]
+    img_url = f"https://storage.googleapis.com/{bucket_name}/{img_path}"
     Session = sessionmaker(db)
     session = Session()
 
-    person = PersonAlert(device_id='asd', alert_time=data['timeCreated'], image=data['name'])
+    person = PersonAlert(device_id=device_id, alert_time=data['timeCreated'], image=img_url)
 
     session.add(person)
     session.commit()
