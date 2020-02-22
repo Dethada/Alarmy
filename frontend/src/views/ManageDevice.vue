@@ -7,7 +7,6 @@
           <v-text-field v-model="deviceInfo.alertInterval" label="Alert Interval"></v-text-field>
           <v-text-field v-model="deviceInfo.alarmDuration" label="Alarm Duration"></v-text-field>
           <v-text-field v-model="deviceInfo.tempThreshold" label="Temperature Threshold"></v-text-field>
-          <v-text-field v-model="deviceInfo.email" label="From Email"></v-text-field>
           <v-text-field v-model="deviceInfo.motd" counter=32 label="Message of the Day"></v-text-field>
           <v-text-field
             v-model="deviceInfo.alarmCode"
@@ -21,6 +20,7 @@
           <v-switch v-model="deviceInfo.vflip" class="ma-2" label="Vertically flip camera"></v-switch>
           <v-switch v-model="deviceInfo.detectHumans" class="ma-2" label="Detect Humans"></v-switch>
           <v-btn class="mr-4" type="submit">submit</v-btn>
+          <v-btn @click="deRegisterDevice">Deregister Device</v-btn>
         </v-form>
       </v-container>
       <v-container v-else>
@@ -48,7 +48,6 @@ export default {
           pollInterval
           alertInterval
           alarmDuration
-          email
           vflip
           motd
           alarmCode
@@ -79,7 +78,6 @@ export default {
               $alertInterval: Int
               $alarmDuration: Int
               $alarm: Boolean
-              $email: String
               $vflip: Boolean
               $motd: String
               $alarmCode: String
@@ -91,7 +89,6 @@ export default {
                 alertInterval: $alertInterval
                 alarmDuration: $alarmDuration
                 alarm: $alarm
-                email: $email
                 vflip: $vflip
                 motd: $motd
                 alarmCode: $alarmCode
@@ -109,7 +106,6 @@ export default {
             alertInterval: this.deviceInfo.alertInterval,
             alarmDuration: this.deviceInfo.alarmDuration,
             alarm: this.deviceInfo.alarm,
-            email: this.deviceInfo.email,
             vflip: this.deviceInfo.vflip,
             motd: this.deviceInfo.motd,
             alarmCode: this.deviceInfo.alarmCode,
@@ -134,7 +130,7 @@ export default {
           // Query
           mutation: gql`
             mutation(
-              $deviceId: String
+              $deviceId: String!
             ) {
               registerDevice(
                 deviceId: $deviceId
@@ -151,11 +147,36 @@ export default {
         })
         .then(data => {
           this.sendSuccess("Registered Device");
+          this.$apollo.queries.deviceInfo.refetch();
           // Result
           console.log(data);
         })
         .catch(error => {
           this.sendError("Failed to register device");
+          // Error
+          console.error(error);
+        });
+    },
+    deRegisterDevice: function() {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: gql`
+            mutation {
+              deregisterDevice {
+                result
+              }
+            }
+          `
+        })
+        .then(data => {
+          this.sendSuccess("Deregistered Device");
+          this.$apollo.queries.deviceInfo.refetch();
+          // Result
+          console.log(data);
+        })
+        .catch(error => {
+          this.sendError("Failed to deregistered device");
           // Error
           console.error(error);
         });

@@ -321,12 +321,14 @@ export default {
               $name: String!
               $password: String!
               $role: String!
+              $getAlerts: Boolean!
             ) {
               createUser(
                 email: $email
                 name: $name
                 password: $password
                 role: $role
+                getAlerts: $getAlerts
               ) {
                 user {
                   name
@@ -341,7 +343,8 @@ export default {
             email: this.newUser.email,
             name: this.newUser.name,
             password: this.newUser.password,
-            role: this.newUser.role
+            role: this.newUser.role,
+            getAlerts: this.newUser.getAlerts
           }
         })
         .then(data => {

@@ -31,6 +31,7 @@ eventlet = "*"
 flask-socketio = "*"
 pandas = "*"
 python-dotenv = "*"
+sendgrid = "*"
 
 [requires]
 python_version = "3.7"
