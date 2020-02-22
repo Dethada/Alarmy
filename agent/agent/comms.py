@@ -22,6 +22,17 @@ MAXIMUM_BACKOFF_TIME = 32
 # Whether to wait with exponential backoff before publishing.
 should_backoff = False
 
+def attach_device(client, device_id, auth):
+    """Attach the device to the gateway."""
+    attach_topic = '/devices/{}/attach'.format(device_id)
+    attach_payload = '{{"authorization" : "{}"}}'.format(auth)
+    client.publish(attach_topic, attach_payload, qos=1)
+
+def detach_device(client, device_id):
+    """Detach the device from the gateway."""
+    detach_topic = '/devices/{}/detach'.format(device_id)
+    print('Detaching: {}'.format(detach_topic))
+
 def create_jwt(project_id, private_key_file, algorithm):
     """Creates a JWT (https://jwt.io) to establish an MQTT connection.
         Args:
@@ -58,6 +69,8 @@ def create_jwt(project_id, private_key_file, algorithm):
 def on_connect(mqttc, userdata, flags, rc):
     print("Connected with result code "+str(rc))
     attach_device(mqttc,config['DEVICE_ID'],'')
+    print('Waiting for device to attach.')
+    time.sleep(5)
     gateway_config_topic = '/devices/{}/config'.format("mqtt-gateway")
     mqttc.subscribe(gateway_config_topic, qos=1)
     mqttc.subscribe(config['TMP']['CONFIG_TOPIC'], qos=1)
@@ -85,17 +98,6 @@ def get_client():
     client.subscribe(error_topic, qos=0)
 
     return client
-
-def attach_device(client, device_id, auth):
-    """Attach the device to the gateway."""
-    attach_topic = '/devices/{}/attach'.format(device_id)
-    attach_payload = '{{"authorization" : "{}"}}'.format(auth)
-    client.publish(attach_topic, attach_payload, qos=1)
-
-def detach_device(client, device_id):
-    """Detach the device from the gateway."""
-    detach_topic = '/devices/{}/detach'.format(device_id)
-    print('Detaching: {}'.format(detach_topic))
 
 mqttc = get_client()
 mqttc.on_connect = on_connect
