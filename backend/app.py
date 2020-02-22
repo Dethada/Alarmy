@@ -2,9 +2,9 @@
 from src import create_app
 from src.extensions import socketio
 import argparse
-# import logging
+import logging
 
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG)
 
 app = create_app()
 
