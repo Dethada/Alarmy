@@ -18,7 +18,7 @@ nanpy = "*"
 rpi-lcd = "*"
 adafruit-circuitpython-matrixkeypad = "*"
 paho-mqtt = "*"
-pyjwt = "*"
+pyjwt = {extras = ["crypto"],version = "*"}
 picamera = "*"
 
 [requires]
