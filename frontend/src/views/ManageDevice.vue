@@ -23,6 +23,13 @@
           <v-btn class="mr-4" type="submit">submit</v-btn>
         </v-form>
       </v-container>
+      <v-container v-else>
+        <h1>Register Device</h1>
+        <v-form action="#" @submit.prevent="registerDevice">
+          <v-text-field v-model="deviceId" label="Device ID"></v-text-field>
+          <v-btn class="mr-4" type="submit">submit</v-btn>
+        </v-form>
+      </v-container>
     </v-card>
   </v-container>
 </template>
@@ -56,6 +63,7 @@ export default {
     return {
       visibleCode: false,
       deviceInfo: null,
+      deviceId: "",
     };
   },
 
@@ -116,6 +124,38 @@ export default {
         })
         .catch(error => {
           this.sendError("Failed to update device");
+          // Error
+          console.error(error);
+        });
+    },
+    registerDevice: function() {
+      this.$apollo
+        .mutate({
+          // Query
+          mutation: gql`
+            mutation(
+              $deviceId: String
+            ) {
+              registerDevice(
+                deviceId: $deviceId
+              ) {
+                device {
+                  alarm
+                }
+              }
+            }
+          `,
+          variables: {
+            deviceId: this.deviceId,
+          }
+        })
+        .then(data => {
+          this.sendSuccess("Registered Device");
+          // Result
+          console.log(data);
+        })
+        .catch(error => {
+          this.sendError("Failed to register device");
           // Error
           console.error(error);
         });
