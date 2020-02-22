@@ -52,3 +52,16 @@ class UpdateDeviceMutation(graphene.Mutation):
         socketio.emit('update_device', '', broadcast=True, namespace='/device')
 
         return UpdateDeviceMutation(device=device)
+
+class RegisterDeviceMutation(graphene.Mutation):
+    class Arguments:
+        device_id = graphene.String(required=True)
+    
+    device = graphene.Field(DeviceType)
+
+    def mutate(self, info, device_id):
+        device = Device(device_id=device_id, poll_interval=60, alert_interval=60, alarm_duration=60,
+                vflip=False, motd='Hello World', alarm_code='1234', detect_humans=False, temp_threshold=50)
+        db.session.add(device)
+        db.session.commit()
+        return RegisterDeviceMutation(device=device)
