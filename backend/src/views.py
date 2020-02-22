@@ -75,8 +75,8 @@ def alert_hook():
 @blueprint.route('/hooks/data', methods=['POST'])
 @jwt_required
 def new_data():
-    # if get_jwt_claims()['role'] != 'Service':
-    #     abort(403)
+    if get_jwt_claims()['role'] != 'Service':
+        abort(403)
     user = User.query.filter_by(email=get_jwt_identity()).first()
     socketio.emit('newValues', '', room=user.device_id)
     return 'Ok'
