@@ -5,6 +5,8 @@ from sendgrid.helpers.mail import (
     FileType, Disposition, ContentId)
 from .models import User
 
+SENDGRID_API_KEY = ''
+
 def send_mail(sender, recipient, subject, content, image_attachment=None):
     '''
     return true if success, false if failed
@@ -16,13 +18,13 @@ def send_mail(sender, recipient, subject, content, image_attachment=None):
         html_content=content)
     if image_attachment:
         attachment = Attachment()
-        attachment.file_content = FileContent(base64.b64encode(image_attachment).decode())
+        attachment.file_content = FileContent(image_attachment)
         attachment.file_type = FileType('image/jpeg')
         attachment.file_name = FileName('captured.jpg')
         attachment.disposition = Disposition('attachment')
         attachment.content_id = ContentId('defaultcid')
         message.attachment = attachment
-    sg = SendGridAPIClient(config.SENDGRID_API_KEY)
+    sg = SendGridAPIClient(SENDGRID_API_KEY)
     response = sg.send(message)
     return response.status_code == 202
 
