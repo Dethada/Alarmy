@@ -18,6 +18,7 @@ def send_mail(sender, recipient, subject, content, image_attachment=None):
         html_content=content)
     if image_attachment:
         attachment = Attachment()
+        # image_attachment is in base64
         attachment.file_content = FileContent(image_attachment)
         attachment.file_type = FileType('image/jpeg')
         attachment.file_name = FileName('captured.jpg')
