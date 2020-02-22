@@ -1,11 +1,10 @@
 from flask import jsonify, request, Blueprint, abort
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_claims
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_claims, get_jwt_identity
 from flask_graphql import GraphQLView
-from flask_socketio import emit
 from argon2 import PasswordHasher
 from .models import User
 from .schema import schema
-from .extensions import db, jwtmanager
+from .extensions import db, jwtmanager, socketio
 from .utils import broadcast_mail
 
 blueprint = Blueprint('general', __name__)
@@ -54,6 +53,7 @@ def login_view():
 def alert_hook():
     if get_jwt_claims()['role'] != 'Service':
         abort(403)
+    user = User.query.filter_by(email=get_jwt_identity()).first()
     req_data = request.get_json()
     #  msg['subject'], msg['content'], msg.get('img_attachment')
     '''
@@ -68,15 +68,18 @@ def alert_hook():
     }
     '''
     broadcast_mail(req_data['deviceID'], req_data['email'])
-    emit('alert', req_data['msg'], broadcast=True, include_self=False)
+    socketio.emit('alert', req_data['msg'], room=user.device_id)
+    return 'Ok'
 
 
 @blueprint.route('/hooks/data', methods=['POST'])
 @jwt_required
 def new_data():
-    if get_jwt_claims()['role'] != 'Service':
-        abort(403)
-    emit('newValues', '', broadcast=True, include_self=False)
+    # if get_jwt_claims()['role'] != 'Service':
+    #     abort(403)
+    user = User.query.filter_by(email=get_jwt_identity()).first()
+    socketio.emit('newValues', '', room=user.device_id)
+    return 'Ok'
 
 
 graphql_view = blueprint.route('/graphql')(jwt_required(GraphQLView.as_view('graphql', schema=schema.schema, context={'session': db.session},
