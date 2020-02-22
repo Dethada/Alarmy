@@ -8,7 +8,7 @@ from src.schema.gas import CustomGasType
 from src.schema.temp import CustomTempType
 from src.schema.env_alert import EnvAlertType, DeleteEnvAlertMutation
 from src.schema.person_alert import PersonAlertType, DeletePersonAlertMutation
-from src.schema.device import DeviceType, UpdateDeviceMutation
+from src.schema.device import DeviceType, UpdateDeviceMutation, RegisterDeviceMutation
 from src.extensions import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -139,6 +139,7 @@ class Mutation(graphene.ObjectType):
     update_user = UpdateUserMutation.Field()
     delete_user = DeleteUserMutation.Field()
     update_device = UpdateDeviceMutation.Field()
+    register_device = RegisterDeviceMutation.Field()
     delete_person_alert = DeletePersonAlertMutation.Field()
     delete_env_alert = DeleteEnvAlertMutation.Field()
 

@@ -27,7 +27,6 @@ class Device(db.Model):
     poll_interval = db.Column(db.Integer, nullable=False)
     alert_interval = db.Column(db.Integer, nullable=False)
     alarm_duration = db.Column(db.Integer, nullable=False)
-    email = db.Column(db.String(320), nullable=False)
     vflip = db.Column(db.Boolean, default=False, nullable=False)
     motd = db.Column(db.String(32), nullable=False)
     alarm_code = db.Column(db.String(16), nullable=False)
