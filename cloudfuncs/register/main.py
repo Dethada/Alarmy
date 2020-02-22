@@ -44,9 +44,6 @@ def main(event, context):
          `timestamp` field contains the publish time.
     """
 
-    print("""This Function was triggered by messageId {} published at {}
-    """.format(context.event_id, context.timestamp))
-
     if 'data' not in event:
         return
     device_id = base64.b64decode(event['data']).decode('utf-8')

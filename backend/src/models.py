@@ -40,7 +40,7 @@ class PersonAlert(db.Model):
     cid = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     device_id = db.Column(db.String(32), db.ForeignKey('device.device_id'), nullable=False)
     alert_time = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    image = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255), nullable=False)
 
     def __str__(self):
         return '<Person alert at %r>' % self.alert_time
