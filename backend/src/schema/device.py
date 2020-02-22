@@ -1,6 +1,8 @@
 import graphene
+from graphql import GraphQLError
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from src.models import Device
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from src.models import Device, User
 from src.extensions import socketio
 from src.extensions import db
 
@@ -59,9 +61,23 @@ class RegisterDeviceMutation(graphene.Mutation):
     
     device = graphene.Field(DeviceType)
 
+    @jwt_required
     def mutate(self, info, device_id):
-        device = Device(device_id=device_id, poll_interval=60, alert_interval=60, alarm_duration=60,
-                vflip=False, motd='Hello World', alarm_code='1234', detect_humans=False, temp_threshold=50)
-        db.session.add(device)
+        device = Device.query.filter_by(device_id=device_id).first()
+        if device:
+            user = User.query.filter_by(email=get_jwt_identity()).first()
+            user.device_id = device.device_id
+            db.session.commit()
+            return RegisterDeviceMutation(device=device)
+        raise GraphQLError('Invalid Device ID')
+
+class DeregisterDeviceMutation(graphene.Mutation):
+    
+    result = graphene.String()
+
+    @jwt_required
+    def mutate(self, info):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        user.device_id = None
         db.session.commit()
-        return RegisterDeviceMutation(device=device)
+        return 'Ok'
