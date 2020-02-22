@@ -20,6 +20,7 @@ adafruit-circuitpython-matrixkeypad = "*"
 paho-mqtt = "*"
 pyjwt = {extras = ["crypto"],version = "*"}
 picamera = "*"
+google-cloud-storage = "*"
 
 [requires]
 python_version = "3.7"
