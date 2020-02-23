@@ -27,7 +27,7 @@ Base = declarative_base()
 class Device(Base):
     __tablename__ = 'device'
 
-    device_id = Column(String(32), primary_key=True)
+    device_id = Column(String(64), primary_key=True)
     alarm = Column(Boolean, default=False, nullable=False)
     poll_interval = Column(Integer, nullable=False)
     alert_interval = Column(Integer, nullable=False)
@@ -43,7 +43,7 @@ class PersonAlert(Base):
     __tablename__ = "person_alert"
 
     cid = Column(BigInteger, primary_key=True, autoincrement=True)
-    device_id = Column(String(32), ForeignKey(
+    device_id = Column(String(64), ForeignKey(
         'device.device_id'), nullable=False)
     alert_time = Column(DateTime, default=datetime.now, nullable=False)
     image = Column(String(255), nullable=False)

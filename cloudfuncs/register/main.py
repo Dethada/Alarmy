@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import base64
+from sqlalchemy.exc import IntegrityError
 import sqlalchemy
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, Integer, Boolean
@@ -21,7 +22,7 @@ db = create_engine(db_uri)
 class Device(Base):
     __tablename__ = 'device'
 
-    device_id = Column(String(32), primary_key=True)
+    device_id = Column(String(64), primary_key=True)
     alarm = Column(Boolean, default=False, nullable=False)
     poll_interval = Column(Integer, nullable=False)
     alert_interval = Column(Integer, nullable=False)
@@ -55,6 +56,8 @@ def main(event, context):
                     vflip=False, motd='Hello World', alarm_code='1234', detect_humans=False, temp_threshold=50)
 
     session.add(device)
-    session.commit()
-
-    print(f'Added device {device_id}')
+    try:
+        session.commit()
+        print(f'Added device {device_id}')
+    except IntegrityError:
+        pass

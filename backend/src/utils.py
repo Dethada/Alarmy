@@ -6,9 +6,8 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Mail, Attachment, FileContent, FileName,
     FileType, Disposition, ContentId)
-from .models import User
-
-SENDGRID_API_KEY = ''
+from .models import User, Device
+from . import SENDGRID_API_KEY, PROJECT_ID, REGION, REGISTRY_ID
 
 def send_mail(sender, recipient, subject, content, image_attachment=None):
     '''
@@ -45,15 +44,13 @@ def broadcast_mail(deviceID, msg):
         else:
             print('Failed to send mail')
 
-def send_hware_config(payload):
-    PROJECT_ID = os.getenv("PROJECT_ID")
-    REGION = os.getenv("REGION")
-    REGISTRY_ID = os.getenv("REGISTRY_ID")
-    DEVICE_ID = os.getenv("DEVICE_ID")
+def send_hware_config(device_id, payload):
     client = iot_v1.DeviceManagerClient()
-    device_path = client.device_path(PROJECT_ID, REGION, REGISTRY_ID, DEVICE_ID)
+    device_path = client.device_path(PROJECT_ID, REGION, REGISTRY_ID, device_id)
 
     data = json.dumps(payload).encode('utf-8')
-    base64.b64encode(data)
-    client.modify_cloud_to_device_config(device_path, data)
+    client.modify_cloud_to_device_config(device_path, base64.b64encode(data))
     print(f"{payload} successfully sent.")
+
+def set_hw_alert(device_id, on):
+    send_hware_config(device_id, {'ALARM_ON': on})

@@ -22,7 +22,7 @@ db = create_engine(db_uri)
 class Device(Base):
     __tablename__ = 'device'
 
-    device_id = Column(String(32), primary_key=True)
+    device_id = Column(String(64), primary_key=True)
     alarm = Column(Boolean, default=False, nullable=False)
     poll_interval = Column(Integer, nullable=False)
     alert_interval = Column(Integer, nullable=False)
@@ -38,7 +38,7 @@ class Temperature(Base):
     __tablename__ = "temperature"
 
     ticker = Column(BigInteger, primary_key=True, autoincrement=True)
-    device_id = Column(String(32), ForeignKey('device.device_id'), nullable=False)
+    device_id = Column(String(64), ForeignKey('device.device_id'), nullable=False)
     value = Column(Float, nullable=False)
     capture_time = Column(DateTime, default=datetime.now,
                           unique=True, nullable=False)
@@ -50,7 +50,7 @@ class Gas(Base):
     __tablename__ = "gas"
 
     ticker = Column(BigInteger, primary_key=True, autoincrement=True)
-    device_id = Column(String(32), ForeignKey('device.device_id'), nullable=False)
+    device_id = Column(String(64), ForeignKey('device.device_id'), nullable=False)
     lpg = Column(Float, nullable=False)
     co = Column(Float, nullable=False)
     smoke = Column(Float, nullable=False)

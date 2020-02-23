@@ -5,7 +5,7 @@ from argon2 import PasswordHasher
 from .models import User
 from .schema import schema
 from .extensions import db, jwtmanager, socketio
-from .utils import broadcast_mail
+from .utils import broadcast_mail, set_hw_alert
 
 blueprint = Blueprint('general', __name__)
 
@@ -69,6 +69,7 @@ def alert_hook():
     '''
     broadcast_mail(req_data['deviceID'], req_data['email'])
     socketio.emit('alert', req_data['msg'], room=user.device_id)
+    set_hw_alert(req_data['deviceID'], True)
     return 'Ok'
 
 
