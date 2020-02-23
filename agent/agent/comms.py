@@ -98,7 +98,7 @@ def get_client():
     error_topic = '/devices/{}/errors'.format(gateway_id)
     client.subscribe(error_topic, qos=0)
 
-    client.publish(f"{config['TMP']['DEVICE_TOPIC']}register",json.dumps(config['DEVICE_ID']),qos=1)
+    client.publish(f"{config['TMP']['DEVICE_TOPIC']}register", config['DEVICE_ID'],qos=1)
 
     return client
 

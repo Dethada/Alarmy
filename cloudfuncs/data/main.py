@@ -6,6 +6,7 @@ from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
 Base = declarative_base()
 
@@ -100,11 +101,18 @@ def main(event, context):
     Session = sessionmaker(db)
     session = Session()
 
+    print(f'Device ID: {device_id}')
     temperature = Temperature(device_id=device_id, value=data.get(
         "temp"), capture_time=data.get("time"))
     gas = Gas(device_id=device_id, lpg=gasdict.get("lpg"), co=gasdict.get(
         "co"), smoke=gasdict.get("smoke"), capture_time=data.get("time"))
-    session.add(temperature)
-    session.add(gas)
-    session.commit()
-    newValues(BACKEND, get_token(BACKEND))
+    try:
+        session.add(temperature)
+        session.add(gas)
+        session.commit()
+        if newValues(BACKEND, get_token(BACKEND)):
+            print('Notified clients')
+        else:
+            print('Failed to notify clients')
+    except IntegrityError:
+        print('Device is not registered')
