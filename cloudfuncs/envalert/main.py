@@ -2,10 +2,12 @@ import os
 import base64
 import json
 from datetime import datetime
+import requests
 from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean, Text, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 
 Base = declarative_base()
 
@@ -87,7 +89,10 @@ class EnvAlert(Base):
 def get_token(host):
     r = requests.post(f'{host}/token/auth', json={'email': SERVICE_USER,
                                                   'pass': SERVICE_PASS})
-    return r.json()['access_token']
+    try:
+        return r.json()['access_token']
+    except json.decoder.JSONDecodeError:
+        return None
 
 
 def newValues(host, token):
@@ -95,10 +100,15 @@ def newValues(host, token):
                       headers={"Authorization": f"Bearer {token}"})
     return r.status_code == 200
 
-def alert(host, token):
-    r = requests.post(f'{host}/hooks/alert',
-                      headers={"Authorization": f"Bearer {token}"})
+
+def alert(host, token, device_id, msg, mail_body):
+    r = requests.post(f'{host}/hooks/alerts', json={'deviceID': device_id, 'email': {
+        "subject": msg,
+        "content": mail_body,
+    }, "msg": msg},
+        headers={"Authorization": f"Bearer {token}"})
     return r.status_code == 200
+
 
 def main(event, context):
     """Background Cloud Function to be triggered by Pub/Sub.
@@ -136,7 +146,11 @@ def main(event, context):
         "co"), smoke=gasdict.get("smoke"), capture_time=alert_time)
     session.add(temperature)
     session.add(gas)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        print('Device is not registered')
+        return
 
     gas_ticker = session.query(Gas).filter(
         Gas.capture_time == alert_time).first().ticker
@@ -146,7 +160,16 @@ def main(event, context):
     envalert = EnvAlert(device_id=device_id, alert_time=alert_time,
                         reason=reason, gas_ticker=gas_ticker, temp_ticker=temp_ticker)
     session.add(envalert)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        print('Device is not registered')
+        return
 
     token = get_token(BACKEND)
     newValues(BACKEND, token)
+    mail_body = f'Time: {alert_time}\nTemp: {temperature.value} LPG: {gas.lpg} CO: {gas.co} Smoke: {gas.smoke}'
+    if alert(BACKEND, token, device_id, reason, mail_body):
+        print(f'Alert trigger successfully\nReason: {reason}')
+    else:
+        print(f'Failed to trigger alert for {reason}')

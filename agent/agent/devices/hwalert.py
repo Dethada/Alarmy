@@ -18,12 +18,16 @@ class HWAlert():
         self.lcd.text('Alert', 1)
         self.lcd.text(self.msg, 2)
         self.bz.on()
+        config['ALARM_ON'] = True
+        write_config()
 
     def off(self):
         self.bz.off()
         self.msg = None
         self.lcd.clear()
         self.lcd.text(config['MOTD'], 1)
+        config['ALARM_ON'] = False
+        write_config()
 
     def _run_for(self, msg, time=0):
         self._stop = False

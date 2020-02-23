@@ -5,6 +5,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import Device, User
 from src.extensions import socketio
 from src.extensions import db
+from src.utils import send_hware_config
 
 
 class DeviceType(SQLAlchemyObjectType):
@@ -18,7 +19,6 @@ class UpdateDeviceMutation(graphene.Mutation):
         alert_interval = graphene.Int()
         alarm_duration = graphene.Int()
         alarm = graphene.Boolean()
-        email = graphene.String()
         vflip = graphene.Boolean()
         motd = graphene.String()
         alarm_code = graphene.String()
@@ -27,31 +27,42 @@ class UpdateDeviceMutation(graphene.Mutation):
 
     device = graphene.Field(DeviceType)
 
-    def mutate(self, info, poll_interval=None, alert_interval=None, alarm_duration=None, alarm=None, email=None, vflip=None, motd=None, alarm_code=None, detect_humans=None, temp_threshold=None):
-        device = Device.query.first()
+    @jwt_required
+    def mutate(self, info, poll_interval=None, alert_interval=None, alarm_duration=None, alarm=None, vflip=None, motd=None, alarm_code=None, detect_humans=None, temp_threshold=None):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
+        device = Device.query.filter_by(device_id=user.device_id).first()
+        config_dict = dict()
         if poll_interval:
             device.poll_interval = poll_interval
+            config_dict['POLL_INTERVAL'] = poll_interval
         if alert_interval:
             device.alert_interval = alert_interval
+            config_dict['ALERT_INTERVAL'] = alert_interval
         if alarm_duration:
             device.alarm_duration = alarm_duration
-        if email:
-            device.email = email
+            config_dict['ALARM_DURATION'] = alarm_duration
         if motd:
             device.motd = motd
+            config_dict['MOTD'] = motd
         if alarm_code:
             device.alarm_code = alarm_code
+            config_dict['KEYPAD_CODE'] = alarm_code
         if temp_threshold:
             device.temp_threshold = temp_threshold
+            config_dict['TEMP_THRESHOLD'] = temp_threshold
         if alarm is not None:
             device.alarm = alarm
+            config_dict['ALARM_ON'] = alarm
         if vflip is not None:
             device.vflip = vflip
+            config_dict['VFLIP'] = vflip
         if detect_humans is not None:
             device.detect_humans = detect_humans
+            config_dict['DETECT_HUMANS'] = detect_humans
 
         db.session.commit()
-        socketio.emit('update_device', '', broadcast=True, namespace='/device')
+        if user.device_id:
+            send_hware_config(user.device_id, config_dict)
 
         return UpdateDeviceMutation(device=device)
 

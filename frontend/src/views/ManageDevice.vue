@@ -2,6 +2,7 @@
   <v-container fluid fill-width>
     <v-card>
       <v-container v-if="deviceInfo">
+        <h3>Device ID: {{deviceInfo.deviceId}}</h3>
         <v-form action="#" @submit.prevent="updateDeviceSettings">
           <v-text-field v-model="deviceInfo.pollInterval" label="Poll Interval"></v-text-field>
           <v-text-field v-model="deviceInfo.alertInterval" label="Alert Interval"></v-text-field>
@@ -53,6 +54,7 @@ export default {
           alarmCode
           detectHumans
           tempThreshold
+          deviceId
         }
       }
     `

@@ -5,7 +5,7 @@ from argon2 import PasswordHasher
 from .models import User
 from .schema import schema
 from .extensions import db, jwtmanager, socketio
-from .utils import broadcast_mail, set_hw_alert
+from .utils import broadcast_mail, set_hw_alert, send_hware_config
 
 blueprint = Blueprint('general', __name__)
 
@@ -82,6 +82,10 @@ def new_data():
     socketio.emit('newValues', '', room=user.device_id)
     return 'Ok'
 
+@blueprint.route('/test')
+def test():
+    send_hware_config('d20c9801aa60470fb760191deff64b4b', {'MOTD':'PLS WORK'})
+    return 'Ok'
 
 graphql_view = blueprint.route('/graphql')(jwt_required(GraphQLView.as_view('graphql', schema=schema.schema, context={'session': db.session},
                                                                             graphiql=True)))

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # Adapted from https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/TFLite_detection_image.py
 import os
+import json
 from datetime import datetime
+import requests
 from google.cloud import vision
 from google.cloud.vision import types
 from google.cloud import storage

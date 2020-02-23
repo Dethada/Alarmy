@@ -1,6 +1,7 @@
 import os
 import base64
 import json
+import requests
 from datetime import datetime
 from sqlalchemy import Column, BigInteger, DateTime, Float, ForeignKey, String, Boolean, Text, Integer
 from sqlalchemy.ext.declarative import declarative_base
@@ -72,8 +73,10 @@ class Gas(Base):
 def get_token(host):
     r = requests.post(f'{host}/token/auth', json={'email': SERVICE_USER,
                                                   'pass': SERVICE_PASS})
-    return r.json()['access_token']
-
+    try:
+        return r.json()['access_token']
+    except json.decoder.JSONDecodeError:
+        return None
 
 def newValues(host, token):
     r = requests.post(f'{host}/hooks/data',
@@ -106,13 +109,17 @@ def main(event, context):
         "temp"), capture_time=data.get("time"))
     gas = Gas(device_id=device_id, lpg=gasdict.get("lpg"), co=gasdict.get(
         "co"), smoke=gasdict.get("smoke"), capture_time=data.get("time"))
+    session.add(temperature)
+    session.add(gas)
     try:
-        session.add(temperature)
-        session.add(gas)
         session.commit()
-        if newValues(BACKEND, get_token(BACKEND)):
-            print('Notified clients')
-        else:
-            print('Failed to notify clients')
     except IntegrityError:
         print('Device is not registered')
+        return
+    
+    token = get_token(BACKEND)
+    if token:
+        if newValues(BACKEND, token):
+            print('Notified clients')
+            return
+    print('Failed to notify clients')

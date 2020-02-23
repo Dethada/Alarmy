@@ -9,10 +9,7 @@ import jwt
 import paho.mqtt.client as mqtt
 from config import config
 from events import message_handler
-'''
-Registry ID: CA2-Registry
-Region: asia-east1
-'''
+
 # The initial backoff time after a disconnection occurs, in seconds.
 minimum_backoff_time = 1
 
@@ -106,7 +103,6 @@ mqttc = get_client()
 mqttc.on_connect = on_connect
 mqttc.on_message = message_handler
 
-
 def publish(topic, data):
     # attach_device(mqttc,config['DEVICE_ID'],'')
     print(f"{config['TMP']['DEVICE_TOPIC']}{topic}")
@@ -115,5 +111,3 @@ def publish(topic, data):
 
 # non-blocking call
 mqttc.loop_start()
-
-
