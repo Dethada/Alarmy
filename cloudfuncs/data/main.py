@@ -9,6 +9,9 @@ from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
 
+BACKEND = os.getenv('BACKEND')
+SERVICE_USER = os.getenv('SERVICE_USER')
+SERVICE_PASS = os.getenv('SERVICE_PASS')
 DB_HOST = os.getenv('DB_HOST')
 DB_USER = os.getenv('DB_USER')
 DB_PASS = os.getenv('DB_PASS')
@@ -18,6 +21,7 @@ Base = declarative_base()
 
 db_uri = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 db = create_engine(db_uri)
+
 
 class Device(Base):
     __tablename__ = 'device'
@@ -38,7 +42,8 @@ class Temperature(Base):
     __tablename__ = "temperature"
 
     ticker = Column(BigInteger, primary_key=True, autoincrement=True)
-    device_id = Column(String(64), ForeignKey('device.device_id'), nullable=False)
+    device_id = Column(String(64), ForeignKey(
+        'device.device_id'), nullable=False)
     value = Column(Float, nullable=False)
     capture_time = Column(DateTime, default=datetime.now,
                           unique=True, nullable=False)
@@ -46,11 +51,13 @@ class Temperature(Base):
     def str(self):
         return f'{self.value}C at {self.capture_time}'
 
+
 class Gas(Base):
     __tablename__ = "gas"
 
     ticker = Column(BigInteger, primary_key=True, autoincrement=True)
-    device_id = Column(String(64), ForeignKey('device.device_id'), nullable=False)
+    device_id = Column(String(64), ForeignKey(
+        'device.device_id'), nullable=False)
     lpg = Column(Float, nullable=False)
     co = Column(Float, nullable=False)
     smoke = Column(Float, nullable=False)
@@ -59,6 +66,19 @@ class Gas(Base):
 
     def str(self):
         return f'{self.lpg}g PPM {self.co}g PPM {self.smoke}g PPM at {self.capture_time}'
+
+
+def get_token(host):
+    r = requests.post(f'{host}/token/auth', json={'email': SERVICE_USER,
+                                                  'pass': SERVICE_PASS})
+    return r.json()['access_token']
+
+
+def newValues(host, token):
+    r = requests.post(f'{host}/hooks/data',
+                      headers={"Authorization": f"Bearer {token}"})
+    return r.status_code == 200
+
 
 def main(event, context):
     """Background Cloud Function to be triggered by Pub/Sub.
@@ -71,9 +91,6 @@ def main(event, context):
          `timestamp` field contains the publish time.
     """
 
-    print("""This Function was triggered by messageId {} published at {}
-    """.format(context.event_id, context.timestamp))
-
     if 'data' not in event:
         return
     msg_body = base64.b64decode(event.get("data")).decode('utf-8')
@@ -83,8 +100,11 @@ def main(event, context):
     Session = sessionmaker(db)
     session = Session()
 
-    temperature = Temperature(device_id=device_id, value=data.get("temp"), capture_time=data.get("time"))
-    gas = Gas(device_id=device_id,lpg=gasdict.get("lpg"),co=gasdict.get("co"),smoke=gasdict.get("smoke"),capture_time=data.get("time"))
+    temperature = Temperature(device_id=device_id, value=data.get(
+        "temp"), capture_time=data.get("time"))
+    gas = Gas(device_id=device_id, lpg=gasdict.get("lpg"), co=gasdict.get(
+        "co"), smoke=gasdict.get("smoke"), capture_time=data.get("time"))
     session.add(temperature)
     session.add(gas)
     session.commit()
+    newValues(BACKEND, get_token(BACKEND))

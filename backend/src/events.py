@@ -12,7 +12,6 @@ def on_join():
             decoded_token = decode_token(token)
             user = User.query.filter_by(email=decoded_token['identity']).first()
             room = user.device_id
-            print(user.device_id)
             if room:
                 join_room(room)
                 print(f'User {user.name} joined {user.device_id}')

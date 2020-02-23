@@ -7,7 +7,7 @@ from sendgrid.helpers.mail import (
     Mail, Attachment, FileContent, FileName,
     FileType, Disposition, ContentId)
 from .models import User, Device
-from . import SENDGRID_API_KEY, PROJECT_ID, REGION, REGISTRY_ID
+from .config import SENDGRID_API_KEY, PROJECT_ID, REGION, REGISTRY_ID
 
 def send_mail(sender, recipient, subject, content, image_attachment=None):
     '''

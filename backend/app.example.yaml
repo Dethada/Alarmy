@@ -1,0 +1,20 @@
+runtime: python37
+
+entrypoint: gunicorn -b :$PORT --worker-class eventlet -w 1 'src:create_app()'
+
+handlers:
+- url: /.*
+  script: auto
+  secure: always
+  redirect_http_response_code: 301
+
+env_variables:
+  DB_HOST: host ip
+  DB_USER: alarmyuser
+  DB_PASSWORD: password
+  DB_NAME: alarmy
+  JWT_SECRET_KEY: 'myjwtsecretkey'
+  SENDGRID_API_KEY: 'API Key'
+  PROJECT_ID: 'Project ID'
+  REGION: 'region'
+  REGISTRY_ID: 'registry ID'

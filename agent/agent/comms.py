@@ -103,14 +103,15 @@ mqttc = get_client()
 mqttc.on_connect = on_connect
 mqttc.on_message = message_handler
 
+
 def publish(topic, data):
     device_id = config['DEVICE_ID']
     attach_device(mqttc,device_id,'')
     print(f"{config['TMP']['DEVICE_TOPIC']}{topic}")
     mqttc.publish(f"{config['TMP']['DEVICE_TOPIC']}{topic}", json.dumps(data),qos=1)
     detach_device(mqttc,device_id)
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
+
+# Non-Blocking call
 mqttc.loop_start()
+
+publish('register'. config['DEVICE_ID'])
