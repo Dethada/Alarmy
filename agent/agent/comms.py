@@ -32,6 +32,7 @@ def detach_device(client, device_id):
     """Detach the device from the gateway."""
     detach_topic = '/devices/{}/detach'.format(device_id)
     print('Detaching: {}'.format(detach_topic))
+    client.publish(detach_topic, '{}', qos=1)
 
 def create_jwt(project_id, private_key_file, algorithm):
     """Creates a JWT (https://jwt.io) to establish an MQTT connection.
@@ -105,12 +106,10 @@ mqttc.on_message = message_handler
 
 def publish(topic, data):
     device_id = config['DEVICE_ID']
-    attach_device(mqttc,device_id,'')
     print(f"{config['TMP']['DEVICE_TOPIC']}{topic}")
     mqttc.publish(f"{config['TMP']['DEVICE_TOPIC']}{topic}", json.dumps(data),qos=1)
-    detach_device(mqttc,device_id)
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
+
+# non-blocking call
 mqttc.loop_start()
+
+publish('register', config['DEVICE_ID'])
