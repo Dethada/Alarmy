@@ -42,22 +42,12 @@ class Query(graphene.ObjectType):
     def resolve_device_info(self, info):
         user = User.query.filter_by(email=get_jwt_identity()).first()
         return user.device
-    
-    @jwt_required
-    def resolve_all_gas(self, info):
-        user = User.query.filter_by(email=get_jwt_identity()).first()
-        return Gas.query.filter_by(device_id=user.device_id)
-    
-    @jwt_required
-    def resolve_all_temp(self, info):
-        user = User.query.filter_by(email=get_jwt_identity()).first()
-        return Temperature.query.filter_by(device_id=user.device_id)
-    
+
     @jwt_required
     def resolve_all_envalert(self, info):
         user = User.query.filter_by(email=get_jwt_identity()).first()
         return EnvAlert.query.filter_by(device_id=user.device_id)
-    
+
     @jwt_required
     def resolve_all_person_alert(self, info):
         user = User.query.filter_by(email=get_jwt_identity()).first()
@@ -66,7 +56,7 @@ class Query(graphene.ObjectType):
     @jwt_required
     def resolve_person_alert(self, info, cid):
         user = User.query.filter_by(email=get_jwt_identity()).first()
-        return PersonAlert.query.filter_by(cid=cid,device_id=user.device_id).first()
+        return PersonAlert.query.filter_by(cid=cid, device_id=user.device_id).first()
 
     @jwt_required
     def resolve_all_temp(self, info, duration=''):
@@ -90,12 +80,13 @@ class Query(graphene.ObjectType):
             result = [CustomTempType(capture_time=time, value=value)
                       for time, value in zip(df.index, df['value'])]
         elif duration == 'ALL':
-            df = analysis_helper(Temperature.query.statement, '2W')
+            df = analysis_helper(Temperature.query.filter(
+                Temperature.device_id == user.device_id).statement, '2W')
             result = [CustomTempType(capture_time=time, value=value)
                       for time, value in zip(df.index, df['value'])]
         else:
             result = [CustomTempType(capture_time=x.capture_time, value=x.value)
-                      for x in Temperature.query.order_by(Temperature.capture_time.desc()).limit(20)]
+                      for x in Temperature.query.filter(Temperature.device_id == user.device_id).order_by(Temperature.capture_time.desc()).limit(20)]
         return result
 
     @jwt_required
@@ -124,13 +115,14 @@ class Query(graphene.ObjectType):
                 result.append(CustomGasType(capture_time=row.Index,
                                             lpg=row.lpg, co=row.co, smoke=row.smoke))
         elif duration == 'ALL':
-            df = analysis_helper(Gas.query.statement, '2W')
+            df = analysis_helper(Gas.query.filter(
+                Gas.device_id == user.device_id).statement, '2W')
             for row in df.itertuples():
                 result.append(CustomGasType(capture_time=row.Index,
                                             lpg=row.lpg, co=row.co, smoke=row.smoke))
         else:
             result = [CustomGasType(capture_time=x.capture_time, lpg=x.lpg, co=x.co, smoke=x.smoke)
-                      for x in Gas.query.order_by(Gas.capture_time.desc()).limit(20)]
+                      for x in Gas.query.filter(Gas.device_id == user.device_id).order_by(Gas.capture_time.desc()).limit(20)]
         return result
 
 
