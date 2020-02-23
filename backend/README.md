@@ -10,7 +10,7 @@ flask db upgrade # apply migration
 pipenv run ./app.py
 ```
 
-### Commands
+### Development Commands
 ```
 curl -H "Content-Type: application/json" -d '{"email":"admin@admin.com","pass":"password"}' http://127.0.0.1:5000/token/auth
 

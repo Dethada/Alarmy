@@ -1,4 +1,4 @@
-# frontend
+# Frontend Setup
 
 ## Install node and npm
 ```
