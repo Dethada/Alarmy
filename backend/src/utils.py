@@ -1,4 +1,7 @@
 import base64
+import json
+import os
+from google.cloud import iot_v1
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import (
     Mail, Attachment, FileContent, FileName,
@@ -38,3 +41,16 @@ def broadcast_mail(deviceID, msg):
             print('Sent mail')
         else:
             print('Failed to send mail')
+
+def send_hware_config(payload):
+    PROJECT_ID = os.getenv("PROJECT_ID")
+    REGION = os.getenv("REGION")
+    REGISTRY_ID = os.getenv("REGISTRY_ID")
+    DEVICE_ID = os.getenv("DEVICE_ID")
+    client = iot_v1.DeviceManagerClient()
+    device_path = client.device_path(PROJECT_ID, REGION, REGISTRY_ID, DEVICE_ID)
+
+    data = json.dumps(payload).encode('utf-8')
+    base64.b64encode(data)
+    client.modify_cloud_to_device_config(device_path, data)
+    print(f"{payload} successfully sent.")

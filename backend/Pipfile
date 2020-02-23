@@ -32,6 +32,8 @@ flask-socketio = "*"
 pandas = "*"
 python-dotenv = "*"
 sendgrid = "*"
+numpy = "*"
+google-cloud-iot = "*"
 
 [requires]
 python_version = "3.7"
