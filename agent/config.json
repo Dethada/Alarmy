@@ -15,7 +15,7 @@
   "POLL_INTERVAL": 60,
   "ALERT_INTERVAL": 60,
   "TEMP_THRESHOLD": 50,
-  "KEYPAD_CODE": "1234",
+  "KEYPAD_CODE": "1111",
   "MOTD": "bye",
   "VFLIP": false,
   "DETECT_HUMANS": false,
