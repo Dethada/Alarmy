@@ -2,6 +2,7 @@
 # Adapted from https://github.com/EdjeElectronics/TensorFlow-Lite-Object-Detection-on-Android-and-Raspberry-Pi/blob/master/TFLite_detection_image.py
 import os
 import json
+import base64
 from datetime import datetime
 import requests
 from google.cloud import vision
@@ -86,7 +87,6 @@ def download_blob(bucket_name, source_blob_name):
     return blob.download_as_string()
 
 
-
 def delete_blob(bucket_name, blob_name):
     """Deletes a blob from the bucket."""
     storage_client = storage.Client()
@@ -94,6 +94,31 @@ def delete_blob(bucket_name, blob_name):
     bucket = storage_client.bucket(bucket_name)
     blob = bucket.blob(blob_name)
     blob.delete()
+
+
+def get_token(host):
+    r = requests.post(f'{host}/token/auth', json={'email': SERVICE_USER,
+                                                  'pass': SERVICE_PASS})
+    try:
+        return r.json()['access_token']
+    except json.decoder.JSONDecodeError:
+        return None
+
+
+def newValues(host, token):
+    r = requests.post(f'{host}/hooks/data',
+                      headers={"Authorization": f"Bearer {token}"})
+    return r.status_code == 200
+
+
+def alert(host, token, device_id, msg, mail_body, img_data):
+    r = requests.post(f'{host}/hooks/alerts', json={'deviceID': device_id, 'email': {
+        "subject": msg,
+        "content": mail_body,
+        "img_attachment": img_data,
+    }, "msg": msg},
+        headers={"Authorization": f"Bearer {token}"})
+    return r.status_code == 200
 
 
 def main(data, context):
@@ -106,7 +131,7 @@ def main(data, context):
     Returns:
         None; the output is written to Stackdriver Logging
     """
-    bucket_name,img_path = data['bucket'], data['name']
+    bucket_name, img_path = data['bucket'], data['name']
     img_bytes = download_blob(bucket_name, img_path)
     if not detect_human(img_bytes):
         delete_blob(bucket_name, img_path)
@@ -117,7 +142,17 @@ def main(data, context):
     Session = sessionmaker(db)
     session = Session()
 
-    person = PersonAlert(device_id=device_id, alert_time=data['timeCreated'], image=img_url)
+    person = PersonAlert(device_id=device_id,
+                         alert_time=data['timeCreated'], image=img_url)
 
     session.add(person)
     session.commit()
+    reason = 'Person Detected'
+
+    token = get_token(BACKEND)
+    newValues(BACKEND, token)
+    mail_body = f'Time: {alert_time}'
+    if alert(BACKEND, token, device_id, reason, mail_body, base64.b64encode(img_bytes).decode()):
+        print(f'Alert trigger successfully\nReason: {reason}')
+    else:
+        print(f'Failed to trigger alert for {reason}')
