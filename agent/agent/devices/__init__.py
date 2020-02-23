@@ -1,4 +1,4 @@
-import cv2
+from picamera import PiCamera
 from gpiozero import MotionSensor, Buzzer, DigitalInputDevice
 from nanpy import ArduinoApi, SerialManager
 from rpi_lcd import LCD
@@ -13,18 +13,18 @@ def nanpy_connect():
     return arduinoObject
 
 arduino = nanpy_connect()
-arduino.pinMode(config.LM35_PIN, arduino.INPUT)
+arduino.pinMode(config['LM35_PIN'], arduino.INPUT)
 
-mq = MQ2(config.MQ2_APIN, arduino)
+mq = MQ2(config['MQ2_APIN'], arduino)
 lcd = LCD()
-buzzer = Buzzer(config.BUZZER_PIN)
+buzzer = Buzzer(config['BUZZER_PIN'])
 
 hwalert = HWAlert(lcd, buzzer)
 
 keylock = KeyLock(hwalert, lcd)
 
-pir = MotionSensor(config.MOTION_PIN, sample_rate=5, queue_len=1)
+pir = MotionSensor(config['MOTION_PIN'], sample_rate=5, queue_len=1)
 
-mq2_alert = DigitalInputDevice(config.MQ2_DPIN, pull_up=True)
+mq2_alert = DigitalInputDevice(config['MQ2_DPIN'], pull_up=True)
 
-capture = cv2.VideoCapture(0)
+picam = PiCamera()

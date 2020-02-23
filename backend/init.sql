@@ -1,0 +1,3 @@
+CREATE DATABASE alarmy;
+CREATE user alarmyuser WITH ENCRYPTED PASSWORD 'password';
+GRANT ALL PRIVILEGES ON DATABASE alarmy TO alarmyuser;

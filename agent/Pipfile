@@ -12,18 +12,15 @@ verify_ssl = true
 
 [packages]
 gpiozero = "*"
-python-dotenv = "*"
 "rpi.gpio" = "*"
 spidev = "*"
 nanpy = "*"
 rpi-lcd = "*"
 adafruit-circuitpython-matrixkeypad = "*"
-opencv-contrib-python = "==4.1.0.25"
-sqlalchemy = "*"
-psycopg2 = "*"
-python-socketio = {extras = ["client"],version = "*"}
-sendgrid = "*"
-tensorflow = {path = "./tensorflow-2.0.0-cp37-none-linux_armv7l.whl"}
+paho-mqtt = "*"
+pyjwt = {extras = ["crypto"],version = "*"}
+picamera = "*"
+google-cloud-storage = "*"
 
 [requires]
 python_version = "3.7"

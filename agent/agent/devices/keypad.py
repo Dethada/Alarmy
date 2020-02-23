@@ -2,9 +2,7 @@ from time import sleep
 import adafruit_matrixkeypad
 from digitalio import DigitalInOut
 import board
-from models import Device
-from db import session
-from utils.general import Thread
+from utils import Thread, write_config, reload_config
 from config import config
 
 
@@ -27,8 +25,8 @@ class KeyLock():
 
     def enter_key(self, key):
         if not self.armed:
-            device = session.query(Device).first()
-            self.armed = device.alarm
+            reload_config()
+            self.armed = config['ALARM_ON']
         if self.armed:
             self.code = self.code + key
             length = len(self.code)
@@ -43,11 +41,10 @@ class KeyLock():
         self.armed = False
 
     def authenticate(self):
-        if config.KEYPAD_CODE == self.code:
+        if config['KEYPAD_CODE'] == self.code:
             self.disarm()
-            device = session.query(Device).first()
-            device.alarm = False
-            session.commit()
+            config['ALARM_ON'] = False
+            write_config()
         else:
             self.lcd.text('Incorrect!', 2)
             sleep(1)

@@ -19,12 +19,13 @@ class CreateUserMutation(graphene.Mutation):
         email = graphene.String(required=True)
         name = graphene.String(required=True)
         role = graphene.String(required=True)
+        get_alerts = graphene.Boolean(required=True)
         password = graphene.String(required=True)
 
     user = graphene.Field(UserType)
 
     @jwt_required
-    def mutate(self, info, email, name, role, password):
+    def mutate(self, info, email, name, role, get_alerts, password):
         if get_jwt_claims()['role'] != 'Admin':
             raise GraphQLError('Admin permissions required.')
 
@@ -32,7 +33,7 @@ class CreateUserMutation(graphene.Mutation):
             raise GraphQLError('Role must be Admin or User.')
 
         ph = PasswordHasher()
-        user = User(email=email, name=name, role=role,
+        user = User(email=email, name=name, role=role, get_alerts=get_alerts,
                     password=ph.hash(password))
         db.session.add(user)
         db.session.commit()

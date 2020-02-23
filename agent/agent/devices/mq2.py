@@ -4,7 +4,6 @@
 # adapted from https://github.com/tutRPi/Raspberry-Pi-Gas-Sensor-MQ/blob/master/mq.py
 from time import sleep
 import math
-from config import config
 
 
 class MQ2():
