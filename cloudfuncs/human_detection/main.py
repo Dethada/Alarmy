@@ -19,6 +19,9 @@ from sqlalchemy.orm import sessionmaker
 # from devices import hwalert, pir, capture
 # from utils.sensor import trigger_alert_helper
 
+BACKEND = os.getenv('BACKEND')
+SERVICE_USER = os.getenv('SERVICE_USER')
+SERVICE_PASS = os.getenv('SERVICE_PASS')
 DB_HOST = os.getenv('DB_HOST')
 DB_USER = os.getenv('DB_USER')
 DB_PASS = os.getenv('DB_PASS')
@@ -151,7 +154,7 @@ def main(data, context):
 
     token = get_token(BACKEND)
     newValues(BACKEND, token)
-    mail_body = f'Time: {alert_time}'
+    mail_body = f'Time: {data["timeCreated"]}'
     if alert(BACKEND, token, device_id, reason, mail_body, base64.b64encode(img_bytes).decode()):
         print(f'Alert trigger successfully\nReason: {reason}')
     else:

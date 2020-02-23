@@ -4,7 +4,7 @@
       <v-card-actions>
         <v-icon @click="$router.go(-1)">arrow_back</v-icon>
       </v-card-actions>
-      <v-img :src="'data:image/jpeg;base64,'+personAlert.image" height="500px" contain></v-img>
+      <v-img :src="personAlert.image" height="500px" contain></v-img>
 
       <v-card-title>Person Detected</v-card-title>
 
